@@ -34,7 +34,8 @@ export default function TranslationTable() {
     const [translationsBackUp, setTranslationsBackUp] = useState(translations);
     const [sortBy, setSortBy] = useState('All');
     const [open, setOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [anchorElfilter, setAnchorElfilter] = useState(null);
+    const [anchorElSort, setAnchorElSort] = useState(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -67,7 +68,7 @@ export default function TranslationTable() {
     );
 
     const handleClickFilter = (event) => {
-        setAnchorEl(event.currentTarget);
+        setAnchorElfilter(event.currentTarget);
     };
 
     const handleCloseFilter = (status) => {
@@ -82,7 +83,7 @@ export default function TranslationTable() {
                 row.status.toLowerCase().includes(status.toLowerCase())
             ));
         }
-        setAnchorEl(null);
+        setAnchorElfilter(null);
     };
 
 
@@ -97,13 +98,20 @@ export default function TranslationTable() {
 
 
 
-    const handleSortClick = () => {
+    const handleSortClick = (event) => {
+        console.log(event.currentTarget);
+        setAnchorElSort(event.currentTarget);
+        
+
+    }
+
+    const handleCloseSort = (status) => {
         if (sortBy === 'Created') {
             setTranslationsBackUp(
                 [...translations].sort((a, b) => {
                     const dateA = new Date(a.created.split('/').reverse().join('-'));
                     const dateB = new Date(b.created.split('/').reverse().join('-'));
-                    return dateA - dateB;
+                    return status.toLowerCase() === 'Ascending'.toLowerCase()? dateA - dateB : dateB - dateA;
                 }));
         }
         if (sortBy === 'Due') {
@@ -111,22 +119,24 @@ export default function TranslationTable() {
                 [...translations].sort((a, b) => {
                     const dateA = new Date(a.due.split('/').reverse().join('-'));
                     const dateB = new Date(b.due.split('/').reverse().join('-'));
-                    return dateA - dateB;
+                    return status.toLowerCase() === 'Ascending'.toLowerCase()? dateA - dateB : dateB - dateA;
                 }));
         }
 
         if (sortBy === 'Progress') {
             setTranslationsBackUp(
                 [...translations].sort((a, b) => {
-                    return a.progress - b.progress;
+                    return status.toLowerCase() === 'Ascending'.toLowerCase()?a.progress - b.progress:b.progress-a.progress;
                 }));
         }
 
         if (sortBy === 'All') {
-            setTranslationsBackUp(translations);
+            setTranslationsBackUp([...translations].sort((a, b) => {
+                return status.toLowerCase() === 'Ascending'.toLowerCase()?a.id - b.id:b.id-a.id;
+            }));
         }
-
-    }
+        setAnchorElSort(null);
+    };
 
 
     const handleSortChange = (event) => {
@@ -181,6 +191,22 @@ export default function TranslationTable() {
                                 <Typography variant="body2">Sort</Typography>
                             </Box>
                         </Tooltip>
+                        <Menu
+                            anchorEl={anchorElSort}
+                            open={Boolean(anchorElSort)}
+                            onClose={handleClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                        >
+                            <MenuItem onClick={() => handleCloseSort("Descending")} value="Descending">Descending</MenuItem>
+                            <MenuItem onClick={() => handleCloseSort("Ascending")} value="Ascending">Ascending</MenuItem>
+                        </Menu>
                         <Tooltip title="Filter">
                             <Box className={classes.option} onClick={handleClickFilter} >
                                 <FilterListIcon style={{ marginRight: '15px', }} />
@@ -188,8 +214,8 @@ export default function TranslationTable() {
                             </Box>
                         </Tooltip>
                         <Menu
-                            anchorEl={anchorEl}
-                            open={Boolean(anchorEl)}
+                            anchorEl={anchorElfilter}
+                            open={Boolean(anchorElfilter)}
                             onClose={handleClose}
                             anchorOrigin={{
                                 vertical: 'bottom',
