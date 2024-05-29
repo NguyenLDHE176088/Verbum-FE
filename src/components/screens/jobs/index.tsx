@@ -184,8 +184,8 @@ export function JobsScreen() {
   });
 
   return (
-    <div className="w-full">
-      <UtilsBar table={table} />
+    <div className="w-full p-2 border-solid border-2">
+      <UtilsBar table={table} rowSelection={rowSelection} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
