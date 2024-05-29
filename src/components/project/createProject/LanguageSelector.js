@@ -77,7 +77,7 @@ const LanguageSelector = () => {
                                     <div key={code}
                                         onClick={() => handleCheckboxChange(code)}
                                         style={{
-                                            padding: '5px', backgroundColor: '#80808057', margin: '0px 5px', borderRadius: '10px',
+                                            padding: '5px', backgroundColor: '#F3F3F3', margin: '0px 5px', borderRadius: '10px',
                                         }}>
                                         {languages.find(lang => lang.code === code)?.name}
                                     </div>
