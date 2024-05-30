@@ -1,0 +1,14 @@
+.header {
+    background: linear-gradient(to left, #00BFA6, #00bfa6);
+    padding: 20px;
+    border-bottom-right-radius: 150px;
+    border-bottom-left-radius: 150px;
+    color: white;
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .header h1 {
+    margin-left:5%;
+    font-size: 2rem;
+  }
