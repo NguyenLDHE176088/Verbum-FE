@@ -10,8 +10,14 @@ import {Button} from "@/components/ui/button";
 import VerbumLogo from "../../../public/verbum_logo.png";
 import Image from "next/image";
 import Link from "next/link";
+import {useState, useTransition} from "react";
+import {login} from "@/data/auth";
+import FormError from "@/components/auth/form-error";
+import {redirect} from "next/navigation";
 
 export default function LoginForm() {
+    const [isPending, startTransition] = useTransition();
+    const [error, setError] = useState<string | null>(null)
     const form = useForm<z.infer<typeof LoginSchema>>({
             resolver: zodResolver(LoginSchema),
             defaultValues: {
@@ -21,7 +27,15 @@ export default function LoginForm() {
         }
     );
     const onSubmit = (value: z.infer<typeof LoginSchema>) => {
-        console.log()
+        startTransition(async () => {
+            const response = await login(value)
+            if (response.error) {
+                setError('Invalid username or password')
+            }
+            if (response.success) {
+                redirect('/')
+            }
+        })
     }
     return (
         <Form {...form}>
@@ -50,7 +64,8 @@ export default function LoginForm() {
                         <FormMessage/>
                     </FormItem>
                 )} name='password'/>
-                <Button className='rounded-3xl'>Login</Button>
+                <FormError message={error}/>
+                <Button className='rounded-3xl' disabled={isPending}>Login</Button>
             </form>
         </Form>
     );

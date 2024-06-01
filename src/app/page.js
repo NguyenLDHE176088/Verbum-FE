@@ -10,6 +10,7 @@ import {
 import '@/components/common/NavBar'
 import NavBar from "@/components/common/NavBar";
 
+import {Toaster} from "@/components/ui/toaster";
 
 export default function Home() {
   return (
