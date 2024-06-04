@@ -22,26 +22,18 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import QueryHeader from "./QueryHeader";
-import { Badge } from "@/components/ui/badge";
 
-const ARROW_CONVERT = "arrow_convert";
-const FILE_NAME = "filename";
+const NAME = "name";
 ///type of job detail
-type Job = {
+type Reference = {
   id: number;
+  name: string;
+  createdBy: string;
   createdDate: string;
-  source: string;
-  target: string;
-  fileName: string;
-  words: number;
-  provider: string;
-  progress: string;
-  dueDate: string;
-  status: string;
 };
 
 //Column Definitions
-const columns: ColumnDef<Job>[] = [
+const columns: ColumnDef<Reference>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -69,12 +61,17 @@ const columns: ColumnDef<Job>[] = [
     header: () => <p className="font-bold">#</p>,
   },
   {
-    accessorKey: "createdDate",
+    accessorKey: NAME,
+    header: () => <p>Name</p>,
+    cell: ({ row }) => <div>{row.getValue(NAME)}</div>,
+  },
+  {
+    accessorKey: "createdBy",
     header: ({ column }) => {
       return (
         <Button
-          variant="ghost"
           className="pl-0"
+          variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Create Date
@@ -84,7 +81,7 @@ const columns: ColumnDef<Job>[] = [
     },
   },
   {
-    accessorKey: "source",
+    accessorKey: "createdDate",
     header: ({ column }) => {
       return (
         <Button
@@ -97,121 +94,10 @@ const columns: ColumnDef<Job>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-left">
-        {row.getValue("source")}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: ARROW_CONVERT,
-    header: " ",
-  },
-  {
-    accessorKey: "target",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Target
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-left">
-        {row.getValue("target")}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: FILE_NAME,
-    header: () => <p className="pl-0">File Name</p>,
-    cell: ({ row }) => (
-      <div className="text-left">{row.getValue(FILE_NAME)}</div>
-    ),
-  },
-  {
-    accessorKey: "words",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Words
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "provider",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Provider
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "progress",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Progress
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "dueDate",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Due date
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
   },
 ];
 
-export function JobTable({ data }) {
+export function ReferenceTable({ data }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -237,8 +123,8 @@ export function JobTable({ data }) {
   return (
     <div className="rounded-md border">
       <QueryHeader
-        name="Jobs"
-        inputQueryType={FILE_NAME}
+        name="References"
+        inputQueryType={NAME}
         table={table}
         rowSelection={rowSelection}
       />
@@ -267,18 +153,14 @@ export function JobTable({ data }) {
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells()?.map((cell) => {
-                  if (cell.column.id === ARROW_CONVERT) {
-                    return <TableCell key={cell.id}>{"→"}</TableCell>;
-                  } else {
-                    return (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    );
-                  }
+                  return (
+                    <TableCell key={cell.id} className="text-left">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  );
                 })}
               </TableRow>
             ))
