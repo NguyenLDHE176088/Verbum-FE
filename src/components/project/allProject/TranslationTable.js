@@ -301,7 +301,7 @@ export default function TranslationTable() {
                     <DialogTitle>Confirmation</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            "KOR TO VN" will be moved to recycle bin and deleted forever after 30 days.
+                            KOR TO VN will be moved to recycle bin and deleted forever after 30 days.
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>

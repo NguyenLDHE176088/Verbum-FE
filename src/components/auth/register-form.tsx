@@ -10,11 +10,19 @@ import {Button} from "@/components/ui/button";
 import VerbumLogo from "../../../public/verbum_logo.png";
 import Image from "next/image";
 import Link from "next/link";
+import {useState} from "react";
+import {register} from "@/data/auth";
+import FormError from "@/components/auth/form-error";
+import {useTransition} from "react";
+import {redirect} from "next/navigation";
 
 export default function RegisterForm() {
+    const [error, setError] = useState<string | null>(null)
+    const [isPending, startTransaction] = useTransition();
     const form = useForm<z.infer<typeof RegisterSchema>>({
             resolver: zodResolver(RegisterSchema),
             defaultValues: {
+                name: '',
                 email: '',
                 password: '',
                 confirmPassword: ''
@@ -22,7 +30,21 @@ export default function RegisterForm() {
         }
     );
     const onSubmit = (value: z.infer<typeof RegisterSchema>) => {
-
+        startTransaction(async () => {
+            const body = {
+                name: value.name,
+                email: value.email,
+                password: value.password,
+                confirmPassword: value.confirmPassword
+            }
+            const response = await register(body);
+            if (response.error) {
+                setError(response.error.message)
+            }
+            if (response.success) {
+                redirect('/auth/login')
+            }
+        })
     }
     return (
         <Form {...form}>
@@ -34,7 +56,17 @@ export default function RegisterForm() {
                 </div>
                 <FormField control={form.control} render={({field}) => (
                     <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                            <Input placeholder="John Doe" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )} name='name'/>
+
+                <FormField control={form.control} render={({field}) => (
+                    <FormItem>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                             <Input placeholder="example@gmail.com" {...field} />
                         </FormControl>
@@ -61,7 +93,8 @@ export default function RegisterForm() {
                         <FormMessage/>
                     </FormItem>
                 )} name='confirmPassword'/>
-                <Button className='rounded-3xl' type='submit'>Register</Button>
+                <FormError message={error}/>
+                <Button className='rounded-3xl' type='submit' disabled={isPending}>Register</Button>
             </form>
         </Form>
     );
