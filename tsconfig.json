@@ -33,7 +33,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/components/project/detail/JobTable.tsx"  ],
+  ],
   "exclude": [
     "node_modules"
   ]
