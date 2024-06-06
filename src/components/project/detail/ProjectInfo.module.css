@@ -1,0 +1,34 @@
+.projectInfoHeading {
+  font-size: 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.displaySection {
+  font-weight: 500;
+  color: grey;
+  line-height: 2.5em;
+}
+.displaySection span {
+  font-weight: 600;
+  color: black;
+  margin: 2%;
+}
+
+.displayObject {
+  display: flex;
+}
+
+.displayObject div:nth-child(2) {
+  color: black;
+  font-weight: 600;
+  margin-left: 2%;
+}
+
+.buttonSection {
+  display: flex;
+  justify-content: start;
+}
+.editButton {
+  margin-right: 1rem;
+  background-color: rgb(32, 185, 206);
+}
