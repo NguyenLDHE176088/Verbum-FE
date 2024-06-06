@@ -22,6 +22,7 @@ const getProjectInfoById = (id) => {
     }
     return data;
 }
+
 export default function ProjectInfo({ id }) {
     const data = getProjectInfoById(id);
     return (

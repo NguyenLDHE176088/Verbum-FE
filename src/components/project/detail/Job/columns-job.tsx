@@ -1,47 +1,14 @@
-"use client";
-import * as React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import QueryHeader from "./QueryHeader";
 import { Badge } from "@/components/ui/badge";
+import { Job} from "@/models/jobs";
 
 const ARROW_CONVERT = "arrow_convert";
 const FILE_NAME = "filename";
-///type of job detail
-type Job = {
-  id: number;
-  createdDate: string;
-  source: string;
-  target: string;
-  fileName: string;
-  words: number;
-  provider: string;
-  progress: string;
-  dueDate: string;
-  status: string;
-};
 
-//Column Definitions
-const columns: ColumnDef<Job>[] = [
+const JobColumns: ColumnDef<Job>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -69,7 +36,7 @@ const columns: ColumnDef<Job>[] = [
     header: () => <p className="font-bold">#</p>,
   },
   {
-    accessorKey: "createdDate",
+    accessorKey: "created_date",
     header: ({ column }) => {
       return (
         <Button
@@ -84,7 +51,7 @@ const columns: ColumnDef<Job>[] = [
     },
   },
   {
-    accessorKey: "source",
+    accessorKey: "source_language",
     header: ({ column }) => {
       return (
         <Button
@@ -99,7 +66,7 @@ const columns: ColumnDef<Job>[] = [
     },
     cell: ({ row }) => (
       <Badge variant="outline" className="text-left">
-        {row.getValue("source")}
+        {row.getValue("source_language")}
       </Badge>
     ),
   },
@@ -108,7 +75,7 @@ const columns: ColumnDef<Job>[] = [
     header: " ",
   },
   {
-    accessorKey: "target",
+    accessorKey: "target_language",
     header: ({ column }) => {
       return (
         <Button
@@ -123,7 +90,7 @@ const columns: ColumnDef<Job>[] = [
     },
     cell: ({ row }) => (
       <Badge variant="outline" className="text-left">
-        {row.getValue("target")}
+        {row.getValue("target_language")}
       </Badge>
     ),
   },
@@ -131,7 +98,7 @@ const columns: ColumnDef<Job>[] = [
     accessorKey: FILE_NAME,
     header: () => <p className="pl-0">File Name</p>,
     cell: ({ row }) => (
-      <div className="text-left">{row.getValue(FILE_NAME)}</div>
+      <div className="text-left">{row.getValue("filename")}</div>
     ),
   },
   {
@@ -180,7 +147,7 @@ const columns: ColumnDef<Job>[] = [
     },
   },
   {
-    accessorKey: "dueDate",
+    accessorKey: "due_date",
     header: ({ column }) => {
       return (
         <Button
@@ -210,87 +177,4 @@ const columns: ColumnDef<Job>[] = [
     },
   },
 ];
-
-export function JobTable({ data }) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    onSortingChange: setSorting,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      rowSelection,
-    },
-  });
-
-  return (
-    <div className="rounded-md border">
-      <QueryHeader
-        name="Jobs"
-        inputQueryType={FILE_NAME}
-        table={table}
-        rowSelection={rowSelection}
-      />
-      <Table className="table-auto ">
-        <TableHeader>
-          {table?.getHeaderGroups()?.map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells()?.map((cell) => {
-                  if (cell.column.id === ARROW_CONVERT) {
-                    return <TableCell key={cell.id}>{"→"}</TableCell>;
-                  } else {
-                    return (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    );
-                  }
-                })}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
+export default JobColumns;
