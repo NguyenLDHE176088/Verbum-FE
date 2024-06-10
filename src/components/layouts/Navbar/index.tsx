@@ -1,33 +1,45 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
-import { Home, LineChart, Package, ShoppingCart, Users } from "lucide-react";
+import {
+  File,
+  Folder,
+  User,
+} from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Navbar() {
+  const pathname = usePathname();
+
   return (
     <div className="flex-1">
       <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
         <Link
           href="/projects"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+            pathname === "/projects" ? "bg-muted" : ""
+          }`}
         >
-          <Home className="h-4 w-4" />
+          <Folder className="h-4 w-4" />
           Projects
         </Link>
         <Link
           href="/jobs"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+            pathname === "/jobs" ? "bg-muted" : ""
+          }`}
         >
-          <ShoppingCart className="h-4 w-4" />
+          <File className="h-4 w-4" />
           Jobs
-          <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-            6
-          </Badge>
         </Link>
         <Link
-          href="/users"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+          href="/user"
+          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+            pathname === "/user" ? "bg-muted" : ""
+          }`}
         >
-          <Package className="h-4 w-4" />
+          <User className="h-4 w-4" />
           Users
         </Link>
       </nav>
