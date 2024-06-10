@@ -7,49 +7,30 @@ import { Combobox } from "@/components/user/create/components/combobox";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import Head from "next/head";
 
-interface PermissionMap {
-  [key: string]: string[];
-}
-
-const permissionsByRole: PermissionMap = {
+const permissionsByRole = {
   "Project Manager": ["Manage Projects", "Assign Tasks", "Review Work"],
   Linguist: ["Translate Text", "Review Translations", "Manage Glossaries"],
   Guest: ["View Projects"],
 };
 
-interface Payload {
-  firstName: string;
-  lastName: string;
-  userName: string;
-  email: string;
-  roleName: string;
-  permissions: string[];
-  allowRejectJob: boolean;
-  status: string;
-  LanguageUser: {
-    langugeCode: string;
-    type: string;
-  }[];
-}
-
 export default function CreateUser() {
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [userName, setUserName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [roleName, setRoleName] = useState<string>("");
-  const [permissions, setPermissions] = useState<string[]>([]);
-  const [allowRejectJob, setAllowRejectJob] = useState<boolean>(false); // Default to false as per the payload
-  const [status] = useState<string>("active"); // Default to active as per the payload
-  const [sourceLanguageCode, setSourceLanguageCode] = useState<string>("EN"); // Default to EN
-  const [targetLanguageCode, setTargetLanguageCode] = useState<string>(""); // No default
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [roleName, setRoleName] = useState("");
+  const [permissions, setPermissions] = useState([]);
+  const [allowRejectJob, setAllowRejectJob] = useState(false); // Default to false as per the payload
+  const [status] = useState("active"); // Default to active as per the payload
+  const [languageCode] = useState("EN"); // Default to EN
+  const [languageType] = useState("source_language"); // Default to source_language
 
-  const handleRoleChange = (role: string) => {
+  const handleRoleChange = (role) => {
     setRoleName(role);
     setPermissions([]); // Reset permissions when role changes
   };
 
-  const handlePermissionChange = (permission: string) => {
+  const handlePermissionChange = (permission: any) => {
     setPermissions((prev) =>
       prev.includes(permission)
         ? prev.filter((p) => p !== permission)
@@ -57,10 +38,10 @@ export default function CreateUser() {
     );
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
-    const payload: Payload = {
+    const payload = {
       firstName,
       lastName,
       userName,
@@ -69,10 +50,7 @@ export default function CreateUser() {
       permissions,
       allowRejectJob,
       status,
-      LanguageUser: [
-        { langugeCode: sourceLanguageCode, type: "source_language" },
-        { langugeCode: targetLanguageCode, type: "target_language" },
-      ],
+      LanguageUser: [{ languageCode: languageCode, type: languageType }],
     };
 
     console.log("Form Submitted", payload);
@@ -119,38 +97,6 @@ export default function CreateUser() {
                 onChange={(e) => setEmail(e.target.value)}
               />
               <Combobox value={roleName} onChange={handleRoleChange} />
-              {roleName === "Linguist" && (
-                <div>
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      checked={allowRejectJob}
-                      onChange={() => setAllowRejectJob(!allowRejectJob)}
-                    />
-                    <span>Allow Reject Job</span>
-                  </label>
-                  <div className="flex flex-col space-y-2">
-                    <label className="flex flex-col space-y-2">
-                      <span>Source Language</span>
-                      <Input
-                        type="text"
-                        placeholder="Enter source language code"
-                        value={sourceLanguageCode}
-                        onChange={(e) => setSourceLanguageCode(e.target.value)}
-                      />
-                    </label>
-                    <label className="flex flex-col space-y-2">
-                      <span>Target Language</span>
-                      <Input
-                        type="text"
-                        placeholder="Enter target language code"
-                        value={targetLanguageCode}
-                        onChange={(e) => setTargetLanguageCode(e.target.value)}
-                      />
-                    </label>
-                  </div>
-                </div>
-              )}
               {roleName && (
                 <div className="flex flex-col">
                   <p className="text-lg font-semibold">Select Permissions</p>
@@ -169,6 +115,17 @@ export default function CreateUser() {
                   ))}
                 </div>
               )}
+              {roleName === "Linguist" ? (
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={allowRejectJob}
+                    onChange={() => setAllowRejectJob(!allowRejectJob)}
+                  />
+                  <span>Allow Reject Job</span>
+                </label>
+              ) : null}
+
               <Button type="submit">Create</Button>
             </form>
           </div>
