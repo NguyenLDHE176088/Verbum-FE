@@ -27,7 +27,7 @@ interface Payload {
   allowRejectJob: boolean;
   status: string;
   LanguageUser: {
-    code: string;
+    languageCode: string;
     type: string;
   }[];
 }
@@ -70,8 +70,8 @@ export default function CreateUser() {
       allowRejectJob,
       status,
       LanguageUser: [
-        { code: sourceLanguageCode, type: "source_language" },
-        { code: targetLanguageCode, type: "target_language" },
+        { languageCode: sourceLanguageCode, type: "source_language" },
+        { languageCode: targetLanguageCode, type: "target_language" },
       ],
     };
 
