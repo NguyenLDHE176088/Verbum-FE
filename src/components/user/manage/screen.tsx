@@ -25,6 +25,7 @@ import {
 import * as React from "react";
 import { User } from "@/models/users";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 const data: User[] = [
   {
@@ -54,6 +55,7 @@ const data: User[] = [
 ];
 
 export default function Index() {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -92,7 +94,11 @@ export default function Index() {
             }
             className="max-w-sm"
           />
-          <Button variant="outline" size="default">
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => router.push('/users/create')}
+          >
             Create
           </Button>
           <Button variant="outline" size="default">

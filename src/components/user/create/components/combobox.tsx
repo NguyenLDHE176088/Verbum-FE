@@ -32,9 +32,8 @@ const roles = [
   },
 ];
 
-export function Combobox() {
+export function Combobox({ value, onChange }) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -60,7 +59,7 @@ export function Combobox() {
                   key={role.value}
                   value={role.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    onChange(currentValue === value ? "" : currentValue);
                     setOpen(false);
                   }}
                 >
