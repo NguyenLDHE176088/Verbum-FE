@@ -2,9 +2,7 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -25,35 +23,12 @@ import {
 import * as React from "react";
 import { User } from "@/models/users";
 import { Input } from "@/components/ui/input";
-
-const data: User[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    username: "johndoe",
-    email: "johndoe@mail.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Jane Doe",
-    username: "janedoe",
-    email: "jane@maile.com",
-    role: "Project Manager",
-    status: "Inactive",
-  },
-  {
-    id: 3,
-    name: "Jake Smith",
-    username: "jsmith",
-    email: "jsmith@gmail.com",
-    role: "Linguist",
-    status: "Active",
-  },
-];
+import { useRouter } from "next/navigation";
+import { deleteUser, getAllUsers } from "@/data/users";
 
 export default function Index() {
+  const [data, setData] = React.useState<User[]>([]);
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -61,6 +36,17 @@ export default function Index() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  // Fetch data on component mount
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const result = await getAllUsers();
+      if (result.success) {
+        setData(result.success);
+      }
+    };
+    fetchData();
+  }, []);
 
   const table = useReactTable({
     data,
@@ -80,6 +66,17 @@ export default function Index() {
       rowSelection,
     },
   });
+
+  const handleEdit = () => {
+    // Logic for edit action
+  };
+
+  const handleDelete = () => {
+    alert("Do you want to delete the selected users?\n This action cannot be undone.");
+    console.log(table.getFilteredSelectedRowModel().rows.map((row) => row.original.id));
+    deleteUser(table.getFilteredSelectedRowModel().rows.map((row) => row.original.id));
+  };
+
   return (
     <div className="w-full rounded-md border m-2">
       <div className="flex justify-between items-center w-full">
@@ -92,13 +89,17 @@ export default function Index() {
             }
             className="max-w-sm"
           />
-          <Button variant="outline" size="default">
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => router.push("/users/create")}
+          >
             Create
           </Button>
-          <Button variant="outline" size="default">
+          <Button variant="outline" size="default" onClick={handleEdit}>
             Edit
           </Button>
-          <Button variant="outline" size="default">
+          <Button variant="outline" size="default" onClick={handleDelete}>
             Delete
           </Button>
         </div>
@@ -108,18 +109,16 @@ export default function Index() {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
