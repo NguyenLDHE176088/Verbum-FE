@@ -1,8 +1,9 @@
 export type User = {
   id: string;
-  name: string;
-  username: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
   email: string;
-  role: string;
-  status: "Active" | "Inactive";
+  roleName: string;
+  status: string;
 };

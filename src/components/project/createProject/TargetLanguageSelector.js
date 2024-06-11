@@ -1,34 +1,42 @@
 
 'use client'
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef,useEffect} from 'react';
 
-const languages = [
-    { code: 'ab', name: 'Abkhaz' },
-    { code: 'ace', name: 'Acehnese' },
-    { code: 'ace-Arab', name: 'Acehnese (Arabic)' },
-    { code: 'ace-Latn', name: 'Acehnese (Latin)' },
-    { code: 'ach', name: 'Acholi' },
-    { code: 'fub', name: 'Adamawa Fulfulde' },
-];
 
-const LanguageSelector = () => {
+const TargetLanguageSelector = ({onLanguagesChange}) => {
+    const [languages, setLanguages] = useState([])
     const [selectedLanguages, setSelectedLanguages] = useState([]);
     const [selectedLanguagesShortCut, setSelectedLanguagesShortCut] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
+    useEffect(()=>{
+        const fetchLanguages = async () => {
+            try {
+                const response = await fetch('http://localhost:9999/languages/getAll');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setLanguages(data.languages); 
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        fetchLanguages();
+    },[]);
+
     const handleCheckboxChange = (code) => {
-        setSelectedLanguages(
-            selectedLanguages.includes(code)
-                ? selectedLanguages.filter((lang) => lang !== code)
-                : [...selectedLanguages, code]
-        );
-        setSelectedLanguagesShortCut(
-            selectedLanguages.includes(code)
-                ? selectedLanguages.filter((lang) => lang !== code).slice(0, 3)
-                : [...selectedLanguages, code].slice(0, 3)
-        );
+
+        const newSelectedLanguages=selectedLanguages.includes(code)
+        ? selectedLanguages.filter((lang) => lang !== code)
+        : [...selectedLanguages, code];
+
+        setSelectedLanguages(newSelectedLanguages);
+        onLanguagesChange(newSelectedLanguages);
+        setSelectedLanguagesShortCut(newSelectedLanguages.slice(0, 3));
     };
 
 
@@ -137,4 +145,4 @@ const LanguageSelector = () => {
     );
 };
 
-export default LanguageSelector;
+export default TargetLanguageSelector;

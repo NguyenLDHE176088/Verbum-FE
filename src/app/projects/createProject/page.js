@@ -6,12 +6,15 @@ import TitlePage from '@/components/project/TitlePage';
 import StatusForm from '@/components/project/createProject/StatusForm';
 import { useState } from 'react';
 
+
+
 export default function CreateProject() {
     const [formState, setFormState] = useState('Details');
+    const [success,setSuccess]=useState('');
     const [detailsForm, setDetailsForm] = useState({
         name: '',
         sourceLanguage: '',
-        targetLanguages: '',
+        targetLanguages: [],
         dueDate: '',
         metadata: ''
     });
@@ -37,6 +40,102 @@ export default function CreateProject() {
         identicalText: { check: false, instantQA: false, ignore: false },
       });
 
+
+     
+
+
+      const createProjectData = () => {
+        const { name, sourceLanguage, targetLanguages, dueDate, metadata } = detailsForm;
+        const { emailed, accepted, completed, delivered, canceled } = statusForm;
+        const {
+            emptyTarget,
+            extraNumber,
+            inconsistentTarget,
+            leadingSpace,
+            maxSegmentLengthPercent,
+            maxTargetSegmentLengthInCharacters,
+            missingNumber,
+            missingSpaces,
+            repeatedWords,
+            spelling,
+            identicalText
+        } = qualityForm;
+    
+    
+        const markProjectAssigned = emailed ? "emailed" : accepted ? "accepted" : "Not Assigned";
+        const markProjectCompleted = completed ? "completed" : delivered ? "delivered" : "Not Completed";
+        const markProjectCanceled = canceled ;
+        const body = {
+            name,
+            createBy: "clwzs3ckg0000bsenh3so7ypg",  
+            description: "This is a new project", 
+            status: "Active",  
+            onwer: "clwzs3ckg0000bsenh3so7ypg",  
+            sourceLanguage,
+            dueDate: new Date(dueDate).toISOString(), 
+            clientName: "Client A",  
+            metadata,
+            markProjectAssigned,
+            markProjectCompleted,
+            markProjectCanceled,
+            emptyTargetQA: emptyTarget.check,
+            emptyTargetIgnore: emptyTarget.ignore,
+            extraNumberInTargetQA: extraNumber.check,
+            extraNumberInTargetIgnore: extraNumber.ignore,
+            inconsistenInTargetQA: inconsistentTarget.check,
+            inconsistenInTargetIgnore: inconsistentTarget.ignore,
+            leadingAndTrailingSpaceQA: leadingSpace.check,
+            leadingAndTrailingSpaceIgnore: leadingSpace.ignore,
+            maxTargetLengthPercentage: maxSegmentLengthPercent.value,
+            maxTargetLengthPercentageQA: maxSegmentLengthPercent.check,
+            maxTargetLengthPercentageIgnore: maxSegmentLengthPercent.ignore,
+            maxTargetLengthCharacter: maxTargetSegmentLengthInCharacters.value,
+            maxTargetLengthCharacterQA: maxTargetSegmentLengthInCharacters.check,
+            maxTargetLengthCharacterIgnore: maxTargetSegmentLengthInCharacters.ignore,
+            missingNumberQA: missingNumber.check,
+            missingNumberIgnore: missingNumber.ignore,
+            missingSpaceQA: missingSpaces.check,
+            missingSpaceIgnore: missingSpaces.ignore,
+            repeatedWordQA: repeatedWords.check,
+            repeatedWordIgnore: repeatedWords.ignore,
+            spellingQA: spelling.check,
+            spellingIgnore: spelling.ignore,
+            targetTextIdenticalQA: identicalText.check,
+            targetTextIdenticalIgnore: identicalText.ignore,
+            targetLanguages: targetLanguages
+        };
+    
+        return body;
+    };
+
+
+    const createProject = async () => {
+        const projectData = createProjectData();
+    
+    
+        try {
+            const response = await fetch('http://localhost:9999/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(projectData)
+            });
+    
+            if (!response.ok) {
+                throw new Error('Something went wrong!');
+            }
+    
+            const result = await response.json();
+            console.log('Project created successfully', result);
+            setSuccess('Project created successfully!');
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+    
+  
+
     const handleOnClickFormState = (state) => {
         setFormState(state);
     };
@@ -54,25 +153,37 @@ export default function CreateProject() {
     const handleQualityChange = (event) => {
         const { name, checked, type, value } = event.target;
         const [field, subfield] = name.split('.');
-        setQualityForm((prevState) => ({
-          ...prevState,
-          [field]: {
-            ...prevState[field],
-            [subfield]: type === 'checkbox' ? checked : value,
-          },
-        }));
-      };
+        setQualityForm((prevState) => {
+            // Tạo một bản sao của đối tượng con đang được cập nhật
+            let updatedField = {
+                ...prevState[field],
+                [subfield]: type === 'checkbox' ? checked : value,
+            };
+    
+            // Nếu subfield là 'check' và checked là true, cập nhật tất cả các subfield khác thành true
+            if (subfield === 'check' && type === 'checkbox' && checked) {
+                updatedField = Object.keys(updatedField).reduce((acc, key) => {
+                    acc[key] = true;
+                    return acc;
+                }, {});
+                // Đảm bảo giữ lại giá trị của 'value' nếu nó tồn tại
+                if (prevState[field].hasOwnProperty('value')) {
+                    updatedField['value'] = prevState[field]['value'];
+                }
+            }
+    
+            return {
+                ...prevState,
+                [field]: updatedField,
+            };
+        });
+    };
+    
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const formData = {
-            ...detailsForm,
-            ...statusForm,
-            ...qualityForm,
-
-        };
-        console.log("Submitting form data: ", formData);
-        // Gửi formData tới API hoặc server của bạn tại đây
+        createProject();
+       
     };
 
     return (
@@ -101,6 +212,7 @@ export default function CreateProject() {
                                 <QualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
                             )}
                             <button type="submit" className={classes.button}>Create project</button>
+                            {success && <p className={classes.successMessage}>{success}</p>}
                         </form>
                     </div>
                 </div>

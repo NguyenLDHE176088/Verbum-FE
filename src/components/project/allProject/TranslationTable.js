@@ -56,7 +56,7 @@ export default function TranslationTable() {
 
     const deleteProject = async () => {
         try {
-            const response = await fetch('http://localhost:9999/projects/delete', {
+            const response = await fetch('http://localhost:9999/projects', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

@@ -2,14 +2,18 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { User } from "@/models/users";
 import { ColumnDef } from "@tanstack/react-table";
 
+// Utility function to convert text to sentence case
+function toSentenceCase(str) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 export const columns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected()
-        }
+        checked={table.getIsAllPageRowsSelected()}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -25,45 +29,44 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: ({ column }) => {
-      return <div className="text-center w-[50px]">#</div>;
+    accessorKey: "order",
+    header: "#",
+    cell: ({ row }) => {
+      const index = row.index + 1; // Calculate the row index
+      return <div>{index}</div>;
     },
-    cell: ({ row }) => <div className="text-center w-[50px]">{row.getValue("id")}</div>,
   },
   {
     accessorKey: "name",
-    header: ({ column }) => {
-      return <div>Name</div>;
-    },
-    cell: ({ row }) => <div className="truncate">{row.getValue("name")}</div>,
+    header: "Name",
+    cell: ({ row }) => (
+      <div className="truncate">{`${row.original.firstName} ${row.original.lastName}`}</div>
+    ),
   },
   {
-    accessorKey: "username",
-    header: ({ column }) => {
-      return <div>Username</div>;
-    },
-    cell: ({ row }) => <div className="truncate">{row.getValue("username")}</div>,
+    accessorKey: "userName",
+    header: "Username",
+    cell: ({ row }) => (
+      <div className="truncate">{row.getValue("userName")}</div>
+    ),
   },
   {
     accessorKey: "email",
-    header: ({ column }) => {
-      return <div>Email</div>;
-    },
+    header: "Email",
     cell: ({ row }) => <div className="truncate">{row.getValue("email")}</div>,
   },
   {
-    accessorKey: "role",
-    header: ({ column }) => {
-      return <div className="">Role</div>;
-    },
-    cell: ({ row }) => <div className="max-w-17">{row.getValue("role")}</div>,
+    accessorKey: "roleName",
+    header: "Role",
+    cell: ({ row }) => (
+      <div className="max-w-17">{toSentenceCase(row.getValue("roleName"))}</div>
+    ),
   },
   {
     accessorKey: "status",
-    header: ({ column }) => {
-      return <div>Status</div>;
-    },
-    cell: ({ row }) => <div className="max-w-12">{row.getValue("status")}</div>,
+    header: "Status",
+    cell: ({ row }) => (
+      <div className="max-w-12">{toSentenceCase(row.getValue("status"))}</div>
+    ),
   },
 ];

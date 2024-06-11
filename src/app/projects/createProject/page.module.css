@@ -51,3 +51,8 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+.successMessage {
+    color: red;
+    margin-top: 10px;
+}
