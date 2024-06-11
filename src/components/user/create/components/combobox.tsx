@@ -43,6 +43,7 @@ export function Combobox({ value, onChange }) {
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between"
+          aria-required="true"
         >
           {value
             ? roles.find((role) => role.value === value)?.label
