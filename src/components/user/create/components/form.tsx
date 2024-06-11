@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Combobox } from "@/components/user/create/components/combobox";
+import { Combobox } from "./combobox";
 export default function CreateUserForm() {
   return (
     <div className="flex flex-col overflow-hidden">
@@ -14,7 +14,7 @@ export default function CreateUserForm() {
             <Input type="text" placeholder="Enter lastname" />
             <Input type="text" placeholder="Enter username" />
             <Input type="email" placeholder="Enter email" />
-            <Combobox />
+            
             <Button type="submit">Create</Button>
           </form>
         </div>

@@ -72,9 +72,15 @@ export default function Index() {
   };
 
   const handleDelete = () => {
-    alert("Do you want to delete the selected users?\n This action cannot be undone.");
-    console.log(table.getFilteredSelectedRowModel().rows.map((row) => row.original.id));
-    deleteUser(table.getFilteredSelectedRowModel().rows.map((row) => row.original.id));
+    alert(
+      "Do you want to delete the selected users?\nThis action cannot be undone."
+    );
+    console.log(
+      table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
+    );
+    deleteUser(
+      table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
+    );
   };
 
   return (
