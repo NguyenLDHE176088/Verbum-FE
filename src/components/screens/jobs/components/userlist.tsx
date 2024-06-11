@@ -23,6 +23,7 @@ type UserListProps = {
   setCheckedUsers: React.Dispatch<
     React.SetStateAction<{ [key: string]: boolean }>
   >;
+  initialSelectedUsers: User[];
   checkedUsers: { [key: string]: boolean };
   index: number;
   users: User[];
@@ -31,13 +32,13 @@ type UserListProps = {
 export function UserList({
   setOpen,
   setSelectedUsers,
+  initialSelectedUsers,
   setCheckedUsers,
   checkedUsers,
   index,
   users,
 }: UserListProps) {
-  const [localSelectedUsers, setLocalSelectedUsers] = useState<User[]>([]);
-
+  const [localSelectedUsers, setLocalSelectedUsers] = useState<User[]>(initialSelectedUsers || []);
   const handleUserCheckboxChange = (user: User) => {
     setCheckedUsers((prev) => ({
       ...prev,
@@ -65,7 +66,7 @@ export function UserList({
                 onCheckedChange={() => handleUserCheckboxChange(user)}
                 className="mr-2"
               />
-              {user.name}
+              {user.lastName} {user.firstName}
             </CommandItem>
           ))}
         </CommandGroup>

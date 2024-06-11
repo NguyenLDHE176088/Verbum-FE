@@ -11,7 +11,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={module.css}>
-      <body className={inter.className}>
+      <body suppressHydrationWarning={true} className={inter.className}>
           {children}
       </body>
     </html>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { z } from "zod";
@@ -19,7 +19,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
 import {
   Popover,
   PopoverContent,
@@ -27,14 +26,18 @@ import {
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UserList } from "../components/userlist";
+import { User } from "@/models/users";
+import { useRouter } from 'next/navigation';
 
 const MOCK_TARGET_LANGUAGES = [
   {
+    id: "en",
     name: "English",
     user: [
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d5c",
-        name: "Phung Lam",
+        firstName: "Phuc Lam",
+        lastName: "Phung",
         username: "lamphung",
         email: "lamphung@email.com",
         role: "Linguist",
@@ -42,7 +45,8 @@ const MOCK_TARGET_LANGUAGES = [
       },
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d6c",
-        name: "Le Nguyen",
+        firstName: "Dai Nguyen",
+        lastName: "Le",
         username: "nguyenle",
         email: "nguyenle@email.com",
         role: "Linguist",
@@ -50,7 +54,8 @@ const MOCK_TARGET_LANGUAGES = [
       },
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d7c",
-        name: "Phan Truong",
+        firstName: "Dang Truong",
+        lastName: "Phan",
         username: "hommet",
         email: "hommet@email.com",
         role: "Linguist",
@@ -59,11 +64,13 @@ const MOCK_TARGET_LANGUAGES = [
     ],
   },
   {
-    name: "Spanish",
+    id: "fr",
+    name: "French",
     user: [
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d5c",
-        name: "Thien Phuoc",
+        firstName: "Thien Phuoc",
+        lastName: "Duong",
         username: "thienphuoc",
         email: "thienphuoc@email.com",
         role: "Linguist",
@@ -71,7 +78,8 @@ const MOCK_TARGET_LANGUAGES = [
       },
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d6c",
-        name: "Tran Huy",
+        firstname: "Quang Huy",
+        lastName: "Tran",
         username: "tranhuy",
         email: "tranhuy@email.com",
         role: "Linguist",
@@ -82,15 +90,32 @@ const MOCK_TARGET_LANGUAGES = [
 ];
 
 const FormSchema = z.object({
-  file: z.any(),
-  target_languages: z.array(z.string()),
+  file: z.custom(
+    (file) => {
+      if (!(file instanceof File)) {
+        return false;
+      }
+      const validTypes = ["image/jpeg", "image/png", "application/pdf"];
+      const maxSize = 5 * 1024 * 1024; // 5 MB
+
+      if (!validTypes.includes(file.type)) {
+        return false;
+      }
+
+      if (file.size > maxSize) {
+        return false;
+      }
+
+      return true;
+    },
+    {
+      message:
+        "Invalid file. Only JPEG, PNG, and PDF files under 5MB are allowed.",
+    }
+  ),
+  target_languages: z.array(z.any()),
   duedate: z.date(),
 });
-
-type User = {
-  id: string;
-  name: string;
-};
 
 type SelectedUsersState = {
   [key: number]: User[];
@@ -104,6 +129,7 @@ export function CreateJobScreen() {
   const [checkedUsers, setCheckedUsers] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const router = useRouter();
 
   useEffect(() => {
     // Simulate fetching target languages from API
@@ -115,9 +141,7 @@ export function CreateJobScreen() {
         return acc;
       }, {})
     );
-    setOpenPopovers(
-      MOCK_TARGET_LANGUAGES.map(() => false)
-    );
+    setOpenPopovers(MOCK_TARGET_LANGUAGES.map(() => false));
   }, []);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -129,10 +153,19 @@ export function CreateJobScreen() {
   });
 
   const handleCheckboxChange = (index: number) => {
-    setCheckedStates((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+    setCheckedStates((prev) => {
+      const newCheckedStates = {
+        ...prev,
+        [index]: !prev[index],
+      };
+
+      const checkedLanguages = targetLanguages.filter(
+        (_, i) => newCheckedStates[i]
+      );
+      form.setValue("target_languages", checkedLanguages);
+
+      return newCheckedStates;
+    });
   };
 
   const handlePopoverToggle = (index: number, isOpen: boolean) => {
@@ -143,28 +176,52 @@ export function CreateJobScreen() {
     });
   };
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
-  }
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const userIds = Object.values(selectedUsers)
+      .flat()
+      .map((user) => user.id);
+    const payload = {
+      userIds,
+      name: data.file.name.split(".")[0],
+      targetLanguageId: data.target_languages[0].id,
+      projectId: 1, // replace with actual project id
+      dueDate: format(data.duedate, "yyyy-MM-dd"),
+      fileExtention: `.${data.file.name.split(".").pop()}`,
+      status: "new",
+    };
 
+    const response = await fetch("http://localhost:9999/jobs/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    window.alert('Request was successful!');
+    router.push('/jobs');
+  }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
         <FormField
           control={form.control}
           name="file"
-          render={() => (
+          render={({ field: { onChange } }) => (
             <FormItem>
               <FormLabel>File</FormLabel>
               <FormControl>
-                <Input type="file" />
+                <Input
+                  type="file"
+                  accept=".jpg, .jpeg, .png, .pdf"
+                  onChange={(event) =>
+                    onChange(event.target.files && event.target.files[0])
+                  }
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -187,7 +244,9 @@ export function CreateJobScreen() {
                 <FormControl>
                   <Popover
                     open={openPopovers[index]}
-                    onOpenChange={(isOpen) => handlePopoverToggle(index, isOpen)}
+                    onOpenChange={(isOpen) =>
+                      handlePopoverToggle(index, isOpen)
+                    }
                   >
                     <PopoverTrigger asChild>
                       <Button
@@ -197,7 +256,7 @@ export function CreateJobScreen() {
                       >
                         {selectedUsers[index] ? (
                           selectedUsers[index]
-                            .map((user) => user.name)
+                            .map((user) => user.lastName + " " + user.firstName)
                             .join(", ")
                         ) : (
                           <>Choose linguists</>
@@ -207,6 +266,7 @@ export function CreateJobScreen() {
                     <PopoverContent className="w-[200px] p-0" align="start">
                       <UserList
                         setOpen={(isOpen) => handlePopoverToggle(index, isOpen)}
+                        initialSelectedUsers={selectedUsers[index]}
                         setSelectedUsers={setSelectedUsers}
                         setCheckedUsers={setCheckedUsers}
                         checkedUsers={checkedUsers}
