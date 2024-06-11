@@ -3,6 +3,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Job } from "@/models/jobs";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 
 export const columns: ColumnDef<Job>[] = [
   {
@@ -27,7 +28,7 @@ export const columns: ColumnDef<Job>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "created_date",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -41,12 +42,14 @@ export const columns: ColumnDef<Job>[] = [
         </div>
       );
     },
-    cell: ({ row }) => (
-      <div className="text-center">{row.getValue("created_date")}</div>
-    ),
+    cell: ({ row }) => {
+      const date = row.getValue("createdAt") as string;
+      const formattedDate = format(new Date(date), "dd/MM/yyyy");
+      return <div className="text-center">{formattedDate}</div>;
+    },
   },
   {
-    accessorKey: "source_language",
+    accessorKey: "sourceLanguage",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -61,11 +64,11 @@ export const columns: ColumnDef<Job>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="text-center">{row.getValue("source_language")}</div>
+      <div className="text-center">{row.getValue("sourceLanguage")}</div>
     ),
   },
   {
-    accessorKey: "target_language",
+    accessorKey: "targetLanguageId",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -80,11 +83,13 @@ export const columns: ColumnDef<Job>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="text-center">{row.getValue("target_language")}</div>
+      <div className="text-center uppercase">
+        {row.getValue("targetLanguageId")}
+      </div>
     ),
   },
   {
-    accessorKey: "filename",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -99,11 +104,11 @@ export const columns: ColumnDef<Job>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="text-center">{row.getValue("filename")}</div>
+      <div className="text-center">{row.getValue("name")}</div>
     ),
   },
   {
-    accessorKey: "project",
+    accessorKey: "pname",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -118,68 +123,68 @@ export const columns: ColumnDef<Job>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="text-center">{row.getValue("project")}</div>
+      <div className="text-center">{row.getValue("pname")}</div>
     ),
   },
+  // {
+  //   accessorKey: "words",
+  //   header: ({ column }) => {
+  //     return (
+  //       <div className="text-center">
+  //         <Button
+  //           variant="ghost"
+  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //         >
+  //           Words
+  //           <ArrowUpDown className="ml-2 h-4 w-4" />
+  //         </Button>
+  //       </div>
+  //     );
+  //   },
+  //   cell: ({ row }) => (
+  //     <div className="text-center">{row.getValue("words")}</div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "provider",
+  //   header: ({ column }) => {
+  //     return (
+  //       <div className="text-center">
+  //         <Button
+  //           variant="ghost"
+  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //         >
+  //           Provider
+  //           <ArrowUpDown className="ml-2 h-4 w-4" />
+  //         </Button>
+  //       </div>
+  //     );
+  //   },
+  //   cell: ({ row }) => (
+  //     <div className="text-center">{row.getValue("provider")}</div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "progress",
+  //   header: ({ column }) => {
+  //     return (
+  //       <div className="text-center">
+  //         <Button
+  //           variant="ghost"
+  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //         >
+  //           Progress
+  //           <ArrowUpDown className="ml-2 h-4 w-4" />
+  //         </Button>
+  //       </div>
+  //     );
+  //   },
+  //   cell: ({ row }) => (
+  //     <div className="text-center">{row.getValue("progress")}</div>
+  //   ),
+  // },
   {
-    accessorKey: "words",
-    header: ({ column }) => {
-      return (
-        <div className="text-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Words
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="text-center">{row.getValue("words")}</div>
-    ),
-  },
-  {
-    accessorKey: "provider",
-    header: ({ column }) => {
-      return (
-        <div className="text-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Provider
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="text-center">{row.getValue("provider")}</div>
-    ),
-  },
-  {
-    accessorKey: "progress",
-    header: ({ column }) => {
-      return (
-        <div className="text-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Progress
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="text-center">{row.getValue("progress")}</div>
-    ),
-  },
-  {
-    accessorKey: "due_date",
+    accessorKey: "dueDate",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -193,9 +198,11 @@ export const columns: ColumnDef<Job>[] = [
         </div>
       );
     },
-    cell: ({ row }) => (
-      <div className="text-center">{row.getValue("due_date")}</div>
-    ),
+    cell: ({ row }) => {
+      const date = row.getValue("dueDate") as string;
+      const formattedDate = format(new Date(date), "dd/MM/yyyy");
+      return <div className="text-center">{formattedDate}</div>;
+    },
   },
   {
     accessorKey: "status",

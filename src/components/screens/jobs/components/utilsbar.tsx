@@ -22,10 +22,10 @@ const UtilsBar: React.FC<UtilsBarProps> = ({ table, rowSelection }) => {
             type="search"
             placeholder="Enter file name..."
             value={
-              (table.getColumn("filename")?.getFilterValue() as string) ?? ""
+              (table.getColumn("name")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) =>
-              table.getColumn("filename")?.setFilterValue(event.target.value)
+              table.getColumn("name")?.setFilterValue(event.target.value)
             }
             className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px] rounded-full"
           />
