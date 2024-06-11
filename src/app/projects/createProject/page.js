@@ -5,46 +5,61 @@ import QualityForm from '@/components/project/createProject/QualityForm.js';
 import TitlePage from '@/components/project/TitlePage';
 import StatusForm from '@/components/project/createProject/StatusForm';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 
 
 export default function CreateProject() {
-    const [formState, setFormState] = useState('Details');
-    const [success,setSuccess]=useState('');
-    const [detailsForm, setDetailsForm] = useState({
+    // const router = useRouter();
+    const details = {
         name: '',
         sourceLanguage: '',
         targetLanguages: [],
         dueDate: '',
         metadata: ''
-    });
-    const [statusForm, setStatusForm] = useState({
+    }
+
+    const status = {
         emailed: false,
         accepted: false,
         completed: false,
         delivered: false,
         canceled: false
-    });
+    }
 
-    const [qualityForm, setQualityForm] = useState({
+    const quality = {
         emptyTarget: { check: false, instantQA: false, ignore: false },
         extraNumber: { check: false, instantQA: false, ignore: false },
         inconsistentTarget: { check: false, instantQA: false, ignore: false },
         leadingSpace: { check: false, instantQA: false, ignore: false },
         maxSegmentLengthPercent: { check: false, instantQA: false, ignore: false, value: 130 },
-        maxTargetSegmentLengthInCharacters: { check: false, instantQA: false, ignore: false, value:1300 },
+        maxTargetSegmentLengthInCharacters: { check: false, instantQA: false, ignore: false, value: 1300 },
         missingNumber: { check: false, instantQA: false, ignore: false },
         missingSpaces: { check: false, instantQA: false, ignore: false },
         repeatedWords: { check: false, instantQA: false, ignore: false },
         spelling: { check: false, instantQA: false, ignore: false },
         identicalText: { check: false, instantQA: false, ignore: false },
-      });
+    }
+
+    // useEffect(() => {
+    //     if (!router) {
+    //         console.error('Router is not mounted');
+    //     }
+    // }, [router]);
 
 
-     
+
+    const [formState, setFormState] = useState('Details');
+    const [success, setSuccess] = useState('');
+    const [detailsForm, setDetailsForm] = useState(details);
+    const [statusForm, setStatusForm] = useState(status);
+    const [qualityForm, setQualityForm] = useState(quality);
 
 
-      const createProjectData = () => {
+
+
+
+    const createProjectData = () => {
         const { name, sourceLanguage, targetLanguages, dueDate, metadata } = detailsForm;
         const { emailed, accepted, completed, delivered, canceled } = statusForm;
         const {
@@ -60,20 +75,20 @@ export default function CreateProject() {
             spelling,
             identicalText
         } = qualityForm;
-    
-    
+
+
         const markProjectAssigned = emailed ? "emailed" : accepted ? "accepted" : "Not Assigned";
         const markProjectCompleted = completed ? "completed" : delivered ? "delivered" : "Not Completed";
-        const markProjectCanceled = canceled ;
+        const markProjectCanceled = canceled;
         const body = {
             name,
-            createBy: "clwzs3ckg0000bsenh3so7ypg",  
-            description: "This is a new project", 
-            status: "Active",  
-            onwer: "clwzs3ckg0000bsenh3so7ypg",  
+            createBy: "clwzs3ckg0000bsenh3so7ypg",
+            description: "This is a new project",
+            status: "Active",
+            onwer: "clwzs3ckg0000bsenh3so7ypg",
             sourceLanguage,
-            dueDate: new Date(dueDate).toISOString(), 
-            clientName: "Client A",  
+            dueDate: new Date(dueDate).toISOString(),
+            clientName: "Client A",
             metadata,
             markProjectAssigned,
             markProjectCompleted,
@@ -104,37 +119,46 @@ export default function CreateProject() {
             targetTextIdenticalIgnore: identicalText.ignore,
             targetLanguages: targetLanguages
         };
-    
+
         return body;
     };
 
 
     const createProject = async () => {
         const projectData = createProjectData();
-    
-    
+
+
         try {
-            const response = await fetch('http://localhost:9999/projects', {
+            const response = await fetch('http://localhost:9999/project', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(projectData)
             });
-    
+
             if (!response.ok) {
                 throw new Error('Something went wrong!');
             }
-    
+
             const result = await response.json();
             console.log('Project created successfully', result);
             setSuccess('Project created successfully!');
+            setDetailsForm(details);
+            setStatusForm(status);
+            setQualityForm(quality);
+            // if (response.ok) {
+            //     router.push('/projects/allProject'); 
+            // } else {
+            //     console.error('Login failed');
+            // }
+
         } catch (error) {
             console.error('Error:', error);
         }
     };
-    
-  
+
+
 
     const handleOnClickFormState = (state) => {
         setFormState(state);
@@ -159,31 +183,42 @@ export default function CreateProject() {
                 ...prevState[field],
                 [subfield]: type === 'checkbox' ? checked : value,
             };
-    
+
             // Nếu subfield là 'check' và checked là true, cập nhật tất cả các subfield khác thành true
-            if (subfield === 'check' && type === 'checkbox' && checked) {
-                updatedField = Object.keys(updatedField).reduce((acc, key) => {
-                    acc[key] = true;
-                    return acc;
-                }, {});
-                // Đảm bảo giữ lại giá trị của 'value' nếu nó tồn tại
-                if (prevState[field].hasOwnProperty('value')) {
-                    updatedField['value'] = prevState[field]['value'];
+            if (subfield === 'check' && type === 'checkbox') {
+                if (checked) {
+                    updatedField = Object.keys(updatedField).reduce((acc, key) => {
+                        acc[key] = true;
+                        return acc;
+                    }, {});
+                    // Đảm bảo giữ lại giá trị của 'value' nếu nó tồn tại
+                    if (prevState[field].hasOwnProperty('value')) {
+                        updatedField['value'] = prevState[field]['value'];
+                    }
+                }else {
+                    updatedField = Object.keys(updatedField).reduce((acc, key) => {
+                        acc[key] = false;
+                        return acc;
+                    }, {});
+                    // Đảm bảo giữ lại giá trị của 'value' nếu nó tồn tại
+                    if (prevState[field].hasOwnProperty('value')) {
+                        updatedField['value'] = prevState[field]['value'];
+                    }
                 }
             }
-    
+
             return {
                 ...prevState,
                 [field]: updatedField,
             };
         });
     };
-    
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
         createProject();
-       
+
     };
 
     return (
