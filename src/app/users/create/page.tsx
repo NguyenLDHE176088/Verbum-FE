@@ -75,13 +75,7 @@ export default function CreateUser() {
 
   return (
     <MainLayout>
-      <Head>
-        <title>Create User</title>
-      </Head>
       <div className="flex flex-col overflow-hidden">
-        <span className="w-full pt-6 pb-3">
-          <p className="ml-4 text-3xl font-bold text-black">Create User</p>
-        </span>
         <div className="flex flex-col w-full">
           <div className="w-full max-w-md border rounded-md">
             <form
