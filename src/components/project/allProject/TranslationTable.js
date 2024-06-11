@@ -17,21 +17,23 @@ import { styled } from '@mui/system';
 import { linearProgressClasses } from '@mui/material/LinearProgress';
 import classes from './TranslationTable.module.css';
 import Link from 'next/link';
+import { format } from 'date-fns';
 
-const translations = [
-    { id: 1, name: 'EN TO VN', progress: 70, created: '10/08/2024', due: '20/05/2025', status: 'In-progress' },
-    { id: 2, name: 'JP TO VN', progress: 100, created: '11/09/2024', due: '21/04/2025', status: 'Finished' },
-    { id: 3, name: 'ES TO VN', progress: 80, created: '12/07/2024', due: '22/07/2025', status: 'In-progress' },
-    { id: 4, name: 'CN TO VN', progress: 100, created: '13/06/2024', due: '23/02/2025', status: 'Finished' },
-    { id: 5, name: 'EN TO VN', progress: 30, created: '10/08/2024', due: '20/05/2025', status: 'In-progress' },
-    { id: 6, name: 'JP TO VN', progress: 20, created: '11/09/2024', due: '21/04/2025', status: 'In-progress' },
-    { id: 7, name: 'ES TO VN', progress: 10, created: '12/07/2024', due: '22/07/2025', status: 'In-progress' },
-    { id: 8, name: 'CN TO VN', progress: 0, created: '13/06/2024', due: '23/02/2025', status: 'In-progress' },
+// const translations = [
+//     { id: 1, name: 'EN TO VN', progress: 70, created: '10/08/2024', due: '20/05/2025', status: 'In-progress' },
+//     { id: 2, name: 'JP TO VN', progress: 100, created: '11/09/2024', due: '21/04/2025', status: 'Finished' },
+//     { id: 3, name: 'ES TO VN', progress: 80, created: '12/07/2024', due: '22/07/2025', status: 'In-progress' },
+//     { id: 4, name: 'CN TO VN', progress: 100, created: '13/06/2024', due: '23/02/2025', status: 'Finished' },
+//     { id: 5, name: 'EN TO VN', progress: 30, created: '10/08/2024', due: '20/05/2025', status: 'In-progress' },
+//     { id: 6, name: 'JP TO VN', progress: 20, created: '11/09/2024', due: '21/04/2025', status: 'In-progress' },
+//     { id: 7, name: 'ES TO VN', progress: 10, created: '12/07/2024', due: '22/07/2025', status: 'In-progress' },
+//     { id: 8, name: 'CN TO VN', progress: 0, created: '13/06/2024', due: '23/02/2025', status: 'In-progress' },
 
-];
+// ];
 
 export default function TranslationTable() {
-    const [translationsBackUp, setTranslationsBackUp] = useState(translations);
+    const [translations, setTranslations] = useState([]);
+    const [translationsBackUp, setTranslationsBackUp] = useState([]);
     const [sortBy, setSortBy] = useState('All');
     const [open, setOpen] = useState(false);
     const [anchorElfilter, setAnchorElfilter] = useState(null);
@@ -42,6 +44,22 @@ export default function TranslationTable() {
     const [ids, setIds] = useState([]);
     const dropdownRefSort = useRef(null);
     const dropdownRefFilter = useRef(null);
+
+    const fetchProjects = async () => {
+        try {
+            const response = await fetch('http://localhost:9999/project');
+            const data = await response.json();
+            console.log(data.data);
+            setTranslationsBackUp(data.data);
+            setTranslations(data.data);
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProjects ();
+    }, []);
 
     const CustomLinearProgress = styled(LinearProgress)(({ theme, value }) => ({
         height: 10,
@@ -56,12 +74,12 @@ export default function TranslationTable() {
 
     const deleteProject = async () => {
         try {
-            const response = await fetch('http://localhost:9999/projects', {
+            const response = await fetch('http://localhost:9999/project', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ ids: [10, 11] })
+                body: JSON.stringify({ ids: ids })
             });
     
             if (!response.ok) {
@@ -70,6 +88,8 @@ export default function TranslationTable() {
     
             const result = await response.json();
             console.log('Delete successful', result);
+            fetchProjects ();
+            setIds([]);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -137,16 +157,16 @@ export default function TranslationTable() {
         if (sortBy === 'Created') {
             setTranslationsBackUp(
                 [...translations].sort((a, b) => {
-                    const dateA = new Date(a.created.split('/').reverse().join('-'));
-                    const dateB = new Date(b.created.split('/').reverse().join('-'));
+                    const dateA = new Date(a.createdAt.split('/').reverse().join('-'));
+                    const dateB = new Date(b.createdAt.split('/').reverse().join('-'));
                     return status.toLowerCase() === 'Ascending'.toLowerCase()? dateA - dateB : dateB - dateA;
                 }));
         }
         if (sortBy === 'Due') {
             setTranslationsBackUp(
                 [...translations].sort((a, b) => {
-                    const dateA = new Date(a.due.split('/').reverse().join('-'));
-                    const dateB = new Date(b.due.split('/').reverse().join('-'));
+                    const dateA = new Date(a.dueDate.split('/').reverse().join('-'));
+                    const dateB = new Date(b.dueDate.split('/').reverse().join('-'));
                     return status.toLowerCase() === 'Ascending'.toLowerCase()? dateA - dateB : dateB - dateA;
                 }));
         }
@@ -336,8 +356,8 @@ export default function TranslationTable() {
                                         <CustomLinearProgress variant="determinate" value={row.progress}
                                             className="linear-progress" />
                                     </TableCell>
-                                    <TableCell>{row.created}</TableCell>
-                                    <TableCell>{row.due}</TableCell>
+                                    <TableCell> {row.createdAt ? format(new Date(row.createdAt), 'dd/MM/yyyy') : 'Invalid Date'}</TableCell>
+                                    <TableCell> {row.dueDate ? format(new Date(row.dueDate), 'dd/MM/yyyy') : 'Invalid Date'}</TableCell>
                                     <TableCell>{row.status}</TableCell>
                                 </TableRow>
                             ))}
@@ -362,7 +382,7 @@ export default function TranslationTable() {
                     <DialogTitle>Confirmation</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {names.join(", ")} will be moved to recycle bin and deleted forever after 30 days.
+                            {ids.join(", ")} will be moved to recycle bin and deleted forever after 30 days.
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
