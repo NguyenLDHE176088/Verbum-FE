@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useState,useRef,useEffect } from 'react';
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Checkbox, LinearProgress, IconButton,
@@ -38,6 +38,10 @@ export default function TranslationTable() {
     const [anchorElSort, setAnchorElSort] = useState(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [names, setNames] = useState([]);
+    const [ids, setIds] = useState([]);
+    const dropdownRefSort = useRef(null);
+    const dropdownRefFilter = useRef(null);
 
     const CustomLinearProgress = styled(LinearProgress)(({ theme, value }) => ({
         height: 10,
@@ -49,6 +53,27 @@ export default function TranslationTable() {
             background: '#00B090',
         },
     }));
+
+    const deleteProject = async () => {
+        try {
+            const response = await fetch('http://localhost:9999/projects', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ids: [10, 11] })
+            });
+    
+            if (!response.ok) {
+                throw new Error('Something went wrong!');
+            }
+    
+            const result = await response.json();
+            console.log('Delete successful', result);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     // Xử lý thay đổi trang
     const handleChangePage = (event, newPage) => {
@@ -87,11 +112,17 @@ export default function TranslationTable() {
     };
 
 
-    const handleClickOpen = () => {
+    const handleClickDelete = () => {
         setOpen(true);
     };
 
     const handleClose = () => {
+
+        setOpen(false);
+    };
+
+    const handleDelete = () => {
+        deleteProject();
         setOpen(false);
     };
 
@@ -99,10 +130,7 @@ export default function TranslationTable() {
 
 
     const handleSortClick = (event) => {
-        console.log(event.currentTarget);
         setAnchorElSort(event.currentTarget);
-        
-
     }
 
     const handleCloseSort = (status) => {
@@ -149,6 +177,35 @@ export default function TranslationTable() {
         ));
     };
 
+    const handleChange=(name,id)=>{
+        setIds(
+            ids.includes(id)?ids.filter(i=>i!==id):[...ids,id]
+        );
+        setNames(
+            names.includes(name)?names.filter(n=>n!==name):[...names,name]
+        );
+
+    }
+
+    const handleClickOutside = (event) => {
+        if (dropdownRefSort.current && !dropdownRefSort.current.contains(event.target)) {
+            setAnchorElSort(null);
+        }
+
+        if (dropdownRefFilter.current && !dropdownRefFilter.current.contains(event.target)) {
+            setAnchorElfilter(null);
+        }
+    };
+
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+
     return (
         <div className={classes.table_container}>
             <div className={classes.table}>
@@ -186,7 +243,7 @@ export default function TranslationTable() {
                     </FormControl>
                     <div className={classes.icon_buttons}>
                         <Tooltip title="Sort">
-                            <Box className={classes.option} onClick={handleSortClick} >
+                            <Box ref={dropdownRefSort} className={classes.option} onClick={handleSortClick} >
                                 <SortIcon style={{ marginRight: '15px', }} />
                                 <Typography variant="body2">Sort</Typography>
                             </Box>
@@ -208,7 +265,7 @@ export default function TranslationTable() {
                             <MenuItem onClick={() => handleCloseSort("Ascending")} value="Ascending">Ascending</MenuItem>
                         </Menu>
                         <Tooltip title="Filter">
-                            <Box className={classes.option} onClick={handleClickFilter} >
+                            <Box ref={dropdownRefFilter} className={classes.option} onClick={handleClickFilter} >
                                 <FilterListIcon style={{ marginRight: '15px', }} />
                                 <Typography variant="body2">Filter</Typography>
                             </Box>
@@ -230,7 +287,7 @@ export default function TranslationTable() {
                             <MenuItem onClick={() => handleCloseFilter("Finished")} value="Finished">Finished</MenuItem>
                         </Menu>
                         <Tooltip title="Delete">
-                            <Box className={classes.option} onClick={handleClickOpen} >
+                            <Box className={classes.option} onClick={handleClickDelete} >
                                 <DeleteIcon style={{ marginRight: '15px', color: 'red' }} />
                                 <Typography variant="body2">Delete</Typography>
                             </Box>
@@ -267,7 +324,11 @@ export default function TranslationTable() {
                             {rowsToShow.map((row) => (
                                 <TableRow key={row.id} className="table-row">
                                     <TableCell padding="checkbox">
-                                        <Checkbox />
+                                        <Checkbox  
+                                            onChange={()=>handleChange(row.name,row.id)}
+                                            checked={ids.includes(row.id)}
+                                        
+                                        />
                                     </TableCell>
                                     <TableCell>{row.id}</TableCell>
                                     <TableCell>{row.name}</TableCell>
@@ -301,11 +362,11 @@ export default function TranslationTable() {
                     <DialogTitle>Confirmation</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            "KOR TO VN" will be moved to recycle bin and deleted forever after 30 days.
+                            {names.join(", ")} will be moved to recycle bin and deleted forever after 30 days.
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose} color="primary" variant="contained" >
+                        <Button onClick={handleDelete} color="primary" variant="contained" >
                             OK
                         </Button>
                         <Button onClick={handleClose} color="primary" variant="contained" style={{ backgroundColor: 'black', }}>

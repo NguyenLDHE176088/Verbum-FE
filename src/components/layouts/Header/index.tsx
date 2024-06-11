@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
   CircleUser,
@@ -20,6 +21,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -28,10 +38,50 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function Header() {
+  const pathname = usePathname();
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
+
+  useEffect(() => {
+    if (pathname) {
+      const linkPath = pathname.split("/");
+      linkPath.shift();
+
+      const pathArray = linkPath.map((path, i) => {
+        return {
+          breadcrumb: path,
+          href: "/" + linkPath.slice(0, i + 1).join("/"),
+        };
+      });
+
+      setBreadcrumbs(pathArray);
+    }
+  }, [pathname]);
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+      <Breadcrumb>
+        <BreadcrumbList>
+          {breadcrumbs.map((breadcrumb, i) => (
+            <BreadcrumbItem
+              key={breadcrumb.href}
+              className="text-xl capitalize text-black"
+            >
+              <BreadcrumbLink
+                href={breadcrumb.href}
+                style={
+                  i === breadcrumbs.length - 1 ? { fontWeight: "bold" } : {}
+                }
+              >
+                {breadcrumb.breadcrumb}
+              </BreadcrumbLink>
+              {i < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+            </BreadcrumbItem>
+          ))}
+        </BreadcrumbList>
+      </Breadcrumb>
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">
