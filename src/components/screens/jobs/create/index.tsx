@@ -36,7 +36,8 @@ const MOCK_TARGET_LANGUAGES = [
     user: [
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d5c",
-        name: "Phung Lam",
+        firstName: "Phuc Lam",
+        lastName: "Phung",
         username: "lamphung",
         email: "lamphung@email.com",
         role: "Linguist",
@@ -44,7 +45,8 @@ const MOCK_TARGET_LANGUAGES = [
       },
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d6c",
-        name: "Le Nguyen",
+        firstName: "Dai Nguyen",
+        lastName: "Le",
         username: "nguyenle",
         email: "nguyenle@email.com",
         role: "Linguist",
@@ -52,7 +54,8 @@ const MOCK_TARGET_LANGUAGES = [
       },
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d7c",
-        name: "Phan Truong",
+        firstName: "Dang Truong",
+        lastName: "Phan",
         username: "hommet",
         email: "hommet@email.com",
         role: "Linguist",
@@ -66,7 +69,8 @@ const MOCK_TARGET_LANGUAGES = [
     user: [
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d5c",
-        name: "Thien Phuoc",
+        firstName: "Thien Phuoc",
+        lastName: "Duong",
         username: "thienphuoc",
         email: "thienphuoc@email.com",
         role: "Linguist",
@@ -74,7 +78,8 @@ const MOCK_TARGET_LANGUAGES = [
       },
       {
         id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d6c",
-        name: "Tran Huy",
+        firstname: "Quang Huy",
+        lastName: "Tran",
         username: "tranhuy",
         email: "tranhuy@email.com",
         role: "Linguist",
@@ -251,7 +256,7 @@ export function CreateJobScreen() {
                       >
                         {selectedUsers[index] ? (
                           selectedUsers[index]
-                            .map((user) => user.name)
+                            .map((user) => user.lastName + " " + user.firstName)
                             .join(", ")
                         ) : (
                           <>Choose linguists</>

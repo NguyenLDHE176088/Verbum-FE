@@ -66,7 +66,7 @@ export function UserList({
                 onCheckedChange={() => handleUserCheckboxChange(user)}
                 className="mr-2"
               />
-              {user.name}
+              {user.lastName} {user.firstName}
             </CommandItem>
           ))}
         </CommandGroup>
