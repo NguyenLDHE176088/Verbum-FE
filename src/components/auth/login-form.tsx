@@ -33,6 +33,7 @@ export default function LoginForm() {
                 setError('Invalid username or password')
             }
             if (response.success) {
+                localStorage.setItem('isCompany', response.success.isHasCompany)
                 redirect('/')
             }
         })
