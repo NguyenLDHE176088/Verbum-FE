@@ -1,7 +1,7 @@
 'use client'
 
 interface RegisterFormProps {
-    name: string
+    username: string
     email: string
     password: string
     confirmPassword: string
