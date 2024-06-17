@@ -6,7 +6,7 @@ export const LoginSchema = z.object({
 })
 
 export const RegisterSchema = z.object({
-    username: z.string().min(1, {message: 'Name is required'}),
+    username: z.string().min(1, {message: 'Name is required'}).regex(new RegExp('^[a-zA-Z0-9_]+$'), {message: 'Name should not contain special characters'}),
     email: z.string().email({message: 'Invalid email address'}),
     password: z.string().min(1, {message: 'Password is required'}),
     confirmPassword: z.string().min(1, {message: 'Confirm password is required'})
