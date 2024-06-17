@@ -1,6 +1,5 @@
 
 import TargetLanguageSelector from './TargetLanguageSelector.js';
-import classes from './DetailsForm.module.css';
 import { useState, useEffect } from 'react';
 
 function DetailsForm({ detailsForm, handleDetailsChange }) {
@@ -32,18 +31,20 @@ function DetailsForm({ detailsForm, handleDetailsChange }) {
     }
     return (
         <div>
-            <div className={classes.formGroup}>
+            <div className="mb-[15px]">
                 <label>Name *</label>
-                <input type="text" name="name" value={detailsForm.name} onChange={handleDetailsChange} className={classes.input} required />
+                <input type="text" name="name" value={detailsForm.name} onChange={handleDetailsChange}
+                 className="w-full p-[10px] border border-[#ddd] rounded"
+                  required />
             </div>
-            <div className={classes.formGroup}>
+            <div className="mb-[15px]">
                 <label>Source language *</label>
                 <select
                    
                     name="sourceLanguage"
                     value={detailsForm.sourceLanguage}
                     onChange={handleDetailsChange}
-                    className={classes.input}
+                    className="w-full p-[10px] border border-[#ddd] rounded"
                     required  
                 >
                     <option  value="" disabled hidden>Select a language</option>
@@ -55,16 +56,20 @@ function DetailsForm({ detailsForm, handleDetailsChange }) {
                 </select>
             </div>
 
-            <div className={classes.formGroup}>
+            <div className="mb-[15px]">
                 <TargetLanguageSelector onLanguagesChange={handleLanguagesChange} />
             </div>
-            <div className={classes.formGroup}>
+            <div className="mb-[15px]">
                 <label>Due Date *</label>
-                <input type="date" name="dueDate" value={detailsForm.dueDate} onChange={handleDetailsChange} className={classes.input} required />
+                <input type="date" name="dueDate" value={detailsForm.dueDate} onChange={handleDetailsChange} 
+                className="w-full p-[10px] border border-[#ddd] rounded"
+                 required />
             </div>
-            <div className={classes.formGroup}>
+            <div className="mb-[15px]">
                 <label>Metadata *</label>
-                <textarea name="metadata" value={detailsForm.metadata} onChange={handleDetailsChange} className={classes.textarea} required></textarea>
+                <textarea name="metadata" value={detailsForm.metadata} onChange={handleDetailsChange} 
+                 className="w-full p-[10px] border border-[#ddd] rounded h-[100px] rounded-2"
+                required></textarea>
             </div>
         </div>
     );

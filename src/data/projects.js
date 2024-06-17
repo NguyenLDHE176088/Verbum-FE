@@ -17,7 +17,6 @@ export async function getAllProjects() {
 }
 
 export async function createProjectFromAPI(projectData) {
-    console.log(projectData);
     try {
         const response = await fetch('http://localhost:9999/projects', {
             method: 'POST',

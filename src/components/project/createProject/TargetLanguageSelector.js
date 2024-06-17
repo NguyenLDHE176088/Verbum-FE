@@ -75,18 +75,19 @@ const TargetLanguageSelector = ({onLanguagesChange}) => {
     return (
         <>
             <label>Target languages</label>
-            <div ref={dropdownRef} style={{ position: 'relative', backgroundColor: 'white', }}>
-                <div onClick={toggleDropdown} style={{ border: '1px solid #ccc', padding: '10px', 
-                borderRadius: '4px', cursor: 'pointer', display: 'flex' ,alignItems:'center',}}>
+            <div ref={dropdownRef} className="relative bg-white">
+                <div onClick={toggleDropdown}
+                className="border border-[#ccc] p-[10px] rounded-[4px] cursor-pointer flex items-center"
+                >
                     {selectedLanguagesShortCut.length > 0 ? (
                         <>
                             {
                                 selectedLanguagesShortCut.map((code) => (
                                     <div key={code}
                                         onClick={() => handleCheckboxChange(code)}
-                                        style={{
-                                            padding: '5px', backgroundColor: '#F3F3F3', margin: '0px 5px', borderRadius: '10px',
-                                        }}>
+                                       
+                                        className="p-[5px] bg-[#F3F3F3] rounded-[10px] mx-[5px]"
+                                        >
                                         {languages.find(lang => lang.code === code)?.name}
                                     </div>
                                 ))
@@ -101,18 +102,19 @@ const TargetLanguageSelector = ({onLanguagesChange}) => {
                         )}
                 </div>
                 {isDropdownOpen && (
-                    <div style={{ position: 'absolute', width: '100%', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: 'white', zIndex: 1 }}>
-                        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                            <div style={{margin:'5px 10px',fontSize:'15px',display:'flex',alignItems:'center',width:'40%'}}>
+                    <div className="absolute w-full border border-[#ccc] rounded-[4px] bg-white z-[1]">
+                        <div 
+                        className="flex items-center justify-between ">
+                            <div className="flex items-center w-[40%] text-[15px] mx-[5px] my-[10px]">
                                 Selected Languages 
-                                <div style={{padding:'5px',backgroundColor:'#80808057',width:'13%',display:'flex',
-                                borderRadius:'50%',justifyContent:'center',margin:'0px 5px'}}>
+                                <div className="p-[5px] bg-[#80808057] w-[13%] flex rounded-[50%]  justify-center mx-[5px]">
                                     {selectedLanguages.length}
                                 </div>
                             </div>
                             {selectedLanguages.length>0&&(
                                 <div onClick={()=>handleClear()}
-                                style={{marginRight:'5%',fontWeight:'bold',cursor:'pointer',}}>clear</div>
+                                className="mr-[5%] font-bold cursor-pointer"
+                                >clear</div>
                             )}
                         </div>
                         <input
@@ -120,22 +122,25 @@ const TargetLanguageSelector = ({onLanguagesChange}) => {
                             value={searchTerm}
                             onChange={handleSearchChange}
                             placeholder="Search"
-                            style={{ width: '95%', padding: '10px', boxSizing: 'border-box',borderRadius:'15px',margin:'5px', }}
+                            className="w-[95%] p-[10px] box-border rounded-[15px] m-[5px] border border-[black]"
+
                         />
-                        <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                        <div className="max-h-[150px] overflow-y-auto">
                             {filteredLanguages.map((lang) => (
-                                <div key={lang.code} style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
+                                <div key={lang.code} className="flex items-center p-[10px]">
                                     <input
                                         type="checkbox"
                                         id={lang.code}
                                         checked={selectedLanguages.includes(lang.code)}
                                         onChange={() => handleCheckboxChange(lang.code)}
                                     />
-                                    <label htmlFor={lang.code} style={{ marginLeft: '8px' }}>{lang.name}</label>
+                                    <label htmlFor={lang.code} className="ml-[8px]">{lang.name}</label>
                                 </div>
                             ))}
                         </div>
-                        <button onClick={() => setIsDropdownOpen(false)} style={{ width: '100%', padding: '10px', border: 'none', backgroundColor: '#007bff', color: 'white', borderRadius: '0 0 4px 4px', cursor: 'pointer' }}>
+                        <button onClick={() => setIsDropdownOpen(false)} 
+                        className="w-full p-[10px] border-none bg-[#007bff] text-white rounded-[4px] cursor-pointer"
+                        >
                             Apply
                         </button>
                     </div>
