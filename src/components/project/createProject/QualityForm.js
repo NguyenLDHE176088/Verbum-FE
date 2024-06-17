@@ -1,89 +1,57 @@
+import React from 'react';
 
-const QualityForm = ({qualityForm,handleQualityChange}) => {
+const QualityForm = ({ qualityForm, handleQualityChange }) => {
   return (
-      <>
-        <div style={styles.headerRow}>
-          <div style={styles.mainColumn}></div>
-          <div style={styles.checkboxColumn}>Instant QA</div>
-          <div style={styles.checkboxColumn}>Ignore</div>
-        </div>
-        {Object.keys(qualityForm).map((key) => (
-          <div style={styles.row} key={key}>
-            <div style={styles.mainColumn}>
-              <label style={styles.checkboxLabel}>
-                <input
-                  style={{marginRight:'10px',}}  
-                  type="checkbox"
-                  name={`${key}.check`}
-                  checked={qualityForm[key].check}
-                  onChange={handleQualityChange}
-                />{' '}
-                {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-              </label>
-              {['maxSegmentLengthPercent', 'maxTargetSegmentLengthInCharacters'].includes(key) && (
-                <input
-                  type="number"
-                  name={`${key}.value`}
-                  value={qualityForm[key].value}
-                  onChange={handleQualityChange}
-                  style={styles.input}
-                  placeholder="Enter value"
-                />
-              )}
-            </div>
-            <div style={styles.checkboxColumn}>
+    <>
+      <div className="flex items-center mb-2 font-bold">
+        <div className="flex-3"></div>
+        <div className="flex-1 flex justify-center">Instant QA</div>
+        <div className="flex-1 flex justify-center">Ignore</div>
+      </div>
+      {Object.keys(qualityForm).map((key) => (
+        <div className="flex items-center mb-2" key={key}>
+          <div className="flex-3 flex items-center">
+            <label className="flex items-center mr-2">
               <input
+                className="mr-2"
                 type="checkbox"
-                name={`${key}.instantQA`}
-                checked={qualityForm[key].instantQA}
+                name={`${key}.check`}
+                checked={qualityForm[key].check}
                 onChange={handleQualityChange}
-              />
-            </div>
-            <div style={styles.checkboxColumn}>
+              />{' '}
+              {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+            </label>
+            {['maxSegmentLengthPercent', 'maxTargetSegmentLengthInCharacters'].includes(key) && (
               <input
-                type="checkbox"
-                name={`${key}.ignore`}
-                checked={qualityForm[key].ignore}
+                type="number"
+                name={`${key}.value`}
+                value={qualityForm[key].value}
                 onChange={handleQualityChange}
+                className="ml-2 w-16"
+                placeholder="Enter value"
               />
-            </div>
+            )}
           </div>
-        ))}
-      </>
+          <div className="flex-1 flex justify-center">
+            <input
+              type="checkbox"
+              name={`${key}.instantQA`}
+              checked={qualityForm[key].instantQA}
+              onChange={handleQualityChange}
+            />
+          </div>
+          <div className="flex-1 flex justify-center">
+            <input
+              type="checkbox"
+              name={`${key}.ignore`}
+              checked={qualityForm[key].ignore}
+              onChange={handleQualityChange}
+            />
+          </div>
+        </div>
+      ))}
+    </>
   );
-};
-
-const styles = {
-    headerRow: {
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '10px',
-        fontWeight: 'bold',
-      },  
-  row: {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: '10px',
-  },
-  mainColumn: {
-    flex: 3,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  checkboxColumn: {
-    flex: 1,
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    marginRight: '10px',
-  },
-  input: {
-    marginLeft: '10px',
-    width: '60px',
-  }
 };
 
 export default QualityForm;

@@ -10,7 +10,7 @@ function DetailsForm({ detailsForm, handleDetailsChange }) {
     useEffect(() => {
         const fetchLanguages = async () => {
             try {
-                const response = await fetch('http://localhost:9999/languages/getAll');
+                const response = await fetch('http://localhost:9999/languages/all');
                 const data = await response.json();
                 setLanguages(data.languages);
             } catch (error) {

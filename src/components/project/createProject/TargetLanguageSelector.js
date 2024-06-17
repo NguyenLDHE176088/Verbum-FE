@@ -14,7 +14,7 @@ const TargetLanguageSelector = ({onLanguagesChange}) => {
     useEffect(()=>{
         const fetchLanguages = async () => {
             try {
-                const response = await fetch('http://localhost:9999/languages/getAll');
+                const response = await fetch('http://localhost:9999/languages/all');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

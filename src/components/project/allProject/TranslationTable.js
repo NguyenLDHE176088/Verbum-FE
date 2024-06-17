@@ -18,6 +18,7 @@ import { linearProgressClasses } from '@mui/material/LinearProgress';
 import classes from './TranslationTable.module.css';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import {getAllProjects,deleteProjectsFromAPI} from '@/data/projects'
 
 // const translations = [
 //     { id: 1, name: 'EN TO VN', progress: 70, created: '10/08/2024', due: '20/05/2025', status: 'In-progress' },
@@ -46,19 +47,18 @@ export default function TranslationTable() {
     const dropdownRefFilter = useRef(null);
 
     const fetchProjects = async () => {
-        try {
-            const response = await fetch('http://localhost:9999/project');
-            const data = await response.json();
-            console.log(data.data);
-            setTranslationsBackUp(data.data);
-            setTranslations(data.data);
-        } catch (error) {
-            console.error('Error fetching projects:', error);
+        const result = await getAllProjects();
+        if (result.success) {
+            setTranslationsBackUp(result.success.data);
+            setTranslations(result.success.data);
+        } else {
+            console.error('Error fetching projects:', result.error);
         }
     };
 
     useEffect(() => {
-        fetchProjects ();
+
+        fetchProjects();
     }, []);
 
     const CustomLinearProgress = styled(LinearProgress)(({ theme, value }) => ({
@@ -73,27 +73,16 @@ export default function TranslationTable() {
     }));
 
     const deleteProject = async () => {
-        try {
-            const response = await fetch('http://localhost:9999/project', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ids: ids })
-            });
-    
-            if (!response.ok) {
-                throw new Error('Something went wrong!');
-            }
-    
-            const result = await response.json();
-            console.log('Delete successful', result);
-            fetchProjects ();
+        const result = await deleteProjectsFromAPI(ids);
+        if (result.success) {
+            fetchProjects();
             setIds([]);
-        } catch (error) {
-            console.error('Error:', error);
+        } else {
+            console.error('Error deleting projects:', result.error);
         }
     };
+
+    
 
     // Xử lý thay đổi trang
     const handleChangePage = (event, newPage) => {
@@ -313,7 +302,7 @@ export default function TranslationTable() {
                             </Box>
                         </Tooltip>
                         <Tooltip title="Add">
-                            <Link href={"/projects/createProject"} >
+                            <Link href={"/projects/create"} >
 
                                 <Box className={classes.optionAdd} >
                                     <Box className={classes.iconAdd}  >
