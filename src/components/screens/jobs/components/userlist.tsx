@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
@@ -13,40 +13,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { User } from "@/models/users";
 
-type SelectedUsersState = {
-  [key: number]: User[];
-};
-
 type UserListProps = {
-  setOpen: (open: boolean) => void;
-  setSelectedUsers: React.Dispatch<React.SetStateAction<SelectedUsersState>>;
-  setCheckedUsers: React.Dispatch<
-    React.SetStateAction<{ [key: string]: boolean }>
-  >;
-  initialSelectedUsers: User[];
-  checkedUsers: { [key: string]: boolean };
-  index: number;
   users: User[];
+  selectedUsers: User[];
+  onUserSelection: (selectedUsers: User[]) => void;
 };
 
-export function UserList({
-  setOpen,
-  setSelectedUsers,
-  initialSelectedUsers,
-  setCheckedUsers,
-  checkedUsers,
-  index,
-  users,
-}: UserListProps) {
-  const [localSelectedUsers, setLocalSelectedUsers] = useState<User[]>(initialSelectedUsers || []);
-  const handleUserCheckboxChange = (user: User) => {
-    setCheckedUsers((prev) => ({
-      ...prev,
-      [user.id]: !prev[user.id],
-    }));
+export function UserList({ users, selectedUsers, onUserSelection }: UserListProps) {
+  const [internalSelectedUsers, setInternalSelectedUsers] =
+    useState<User[]>(selectedUsers);
 
-    setLocalSelectedUsers((prev) =>
-      prev.some((u) => u.id === user.id)
+  useEffect(() => {
+    onUserSelection(internalSelectedUsers);
+  }, []);
+
+  useEffect(() => {
+    setInternalSelectedUsers(selectedUsers);
+  }, [selectedUsers]);
+
+  const handleCheckboxChange = (user: User) => {
+    setInternalSelectedUsers((prev) =>
+      prev.includes(user)
         ? prev.filter((u) => u.id !== user.id)
         : [...prev, user]
     );
@@ -59,29 +46,18 @@ export function UserList({
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup>
           {users.map((user) => (
-            <CommandItem key={user.id} id={user.id}>
-              <Checkbox
-                id={`user-checkbox-${user.id}`}
-                checked={checkedUsers[user.id] || false}
-                onCheckedChange={() => handleUserCheckboxChange(user)}
-                className="mr-2"
+            <CommandItem key={user.id}>
+              <Checkbox 
+                className="mr-3"
+                checked={internalSelectedUsers.includes(user)}
+                onCheckedChange={() => handleCheckboxChange(user)}
               />
-              {user.lastName} {user.firstName}
+              {user.firstName} {user.lastName}
             </CommandItem>
           ))}
         </CommandGroup>
       </CommandList>
-      <Button
-        onClick={() => {
-          setSelectedUsers((prev: SelectedUsersState) => ({
-            ...prev,
-            [index]: localSelectedUsers,
-          }));
-          setOpen(false);
-        }}
-      >
-        Done
-      </Button>
+      <Button onClick={() => onUserSelection(internalSelectedUsers)}>Done</Button>
     </Command>
   );
 }
