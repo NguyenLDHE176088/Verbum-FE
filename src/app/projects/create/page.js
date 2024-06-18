@@ -1,16 +1,17 @@
 "use client"
-import classes from './page.module.css';
 import DetailsForm from '@/components/project/createProject/DetailsForm';
 import QualityForm from '@/components/project/createProject/QualityForm.js';
 import TitlePage from '@/components/project/TitlePage';
 import StatusForm from '@/components/project/createProject/StatusForm';
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { MainLayout } from "@/components/layouts/MainLayout";
+import { createProjectFromAPI } from '@/data/projects';
+import { getUser } from '@/lib/cookies'
+
 
 
 
 export default function CreateProject() {
-    // const router = useRouter();
     const details = {
         name: '',
         sourceLanguage: '',
@@ -41,11 +42,7 @@ export default function CreateProject() {
         identicalText: { check: false, instantQA: false, ignore: false },
     }
 
-    // useEffect(() => {
-    //     if (!router) {
-    //         console.error('Router is not mounted');
-    //     }
-    // }, [router]);
+
 
 
 
@@ -59,7 +56,11 @@ export default function CreateProject() {
 
 
 
-    const createProjectData = () => {
+    const createProjectData = async () => {
+        const user = await getUser();
+        const id = user.id;
+        console.log(id);
+
         const { name, sourceLanguage, targetLanguages, dueDate, metadata } = detailsForm;
         const { emailed, accepted, completed, delivered, canceled } = statusForm;
         const {
@@ -82,10 +83,10 @@ export default function CreateProject() {
         const markProjectCanceled = canceled;
         const body = {
             name,
-            createBy: "clwzs3ckg0000bsenh3so7ypg",
+            createBy: id,
             description: "This is a new project",
             status: "Active",
-            onwer: "clwzs3ckg0000bsenh3so7ypg",
+            onwer: id,
             sourceLanguage,
             dueDate: new Date(dueDate).toISOString(),
             clientName: "Client A",
@@ -117,7 +118,8 @@ export default function CreateProject() {
             spellingIgnore: spelling.ignore,
             targetTextIdenticalQA: identicalText.check,
             targetTextIdenticalIgnore: identicalText.ignore,
-            targetLanguages: targetLanguages
+            targetLanguages: targetLanguages,
+            progress: 100
         };
 
         return body;
@@ -125,36 +127,16 @@ export default function CreateProject() {
 
 
     const createProject = async () => {
-        const projectData = createProjectData();
-
-
-        try {
-            const response = await fetch('http://localhost:9999/project', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(projectData)
-            });
-
-            if (!response.ok) {
-                throw new Error('Something went wrong!');
-            }
-
-            const result = await response.json();
-            console.log('Project created successfully', result);
+        const projectData = await createProjectData();
+        console.log(projectData);
+        const result = await createProjectFromAPI(projectData);
+        if (result.success) {
             setSuccess('Project created successfully!');
             setDetailsForm(details);
             setStatusForm(status);
             setQualityForm(quality);
-            // if (response.ok) {
-            //     router.push('/projects/allProject'); 
-            // } else {
-            //     console.error('Login failed');
-            // }
-
-        } catch (error) {
-            console.error('Error:', error);
+        } else {
+            console.error('Error deleting projects:', result.error);
         }
     };
 
@@ -195,7 +177,7 @@ export default function CreateProject() {
                     if (prevState[field].hasOwnProperty('value')) {
                         updatedField['value'] = prevState[field]['value'];
                     }
-                }else {
+                } else {
                     updatedField = Object.keys(updatedField).reduce((acc, key) => {
                         acc[key] = false;
                         return acc;
@@ -222,37 +204,50 @@ export default function CreateProject() {
     };
 
     return (
-        <>
-            <TitlePage title="Create project" />
 
-            <div className={classes.container}>
-                <div className={classes.formContainer}>
-                    <div className={classes.sidebar}>
-                        <p onClick={() => handleOnClickFormState('Details')}
-                            className={formState === "Details" ? classes.activeTitle : classes.inActiveTitle}>Project Details</p>
-                        <p onClick={() => handleOnClickFormState('Status')}
-                            className={formState === "Status" ? classes.activeTitle : classes.inActiveTitle}>Project Status Automation</p>
-                        <p onClick={() => handleOnClickFormState('Quality')}
-                            className={formState === "Quality" ? classes.activeTitle : classes.inActiveTitle}>Quality Assurance</p>
-                    </div>
-                    <div className={classes.form}>
-                        <form onSubmit={handleSubmit}>
-                            {formState === "Details" && (
-                                <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
-                            )}
-                            {formState === "Status" && (
-                                <StatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
-                            )}
-                            {formState === "Quality" && (
-                                <QualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
-                            )}
-                            <button type="submit" className={classes.button}>Create project</button>
-                            {success && <p className={classes.successMessage}>{success}</p>}
-                        </form>
+        <MainLayout>
+            <>
+                <div className="w-full flex flex-col items-center">
+                    <div className="flex flex-row overflow-hidden w-[95%]" >
+                        <div className="p-4 rounded-lg border-black border-solid border w-[40%]" >
+                            <p
+                                onClick={() => handleOnClickFormState('Details')}
+                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Details" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                            >
+                                Project Details
+                            </p>
+                            <p
+                                onClick={() => handleOnClickFormState('Status')}
+                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Status" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                            >
+                                Project Status Automation
+                            </p>
+                            <p
+                                onClick={() => handleOnClickFormState('Quality')}
+                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Quality" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                            >
+                                Quality Assurance
+                            </p>
+                        </div>
+                        <div className="ml-[5%] rounded-[10px] border border-black flex-1 p-[20px]">
+                            <form onSubmit={handleSubmit}>
+                                {formState === "Details" && (
+                                    <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
+                                )}
+                                {formState === "Status" && (
+                                    <StatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
+                                )}
+                                {formState === "Quality" && (
+                                    <QualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
+                                )}
+                                <button type="submit" className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Create project</button>
+                                {success && <p className="text-red-500 mt-2">{success}</p>}
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </>
+            </>
+        </MainLayout>
     );
 }
 
