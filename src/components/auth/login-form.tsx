@@ -13,7 +13,7 @@ import Link from "next/link";
 import {useState, useTransition} from "react";
 import {login} from "@/data/auth";
 import FormError from "@/components/auth/form-error";
-import {redirect} from "next/navigation";
+import {redirect, useRouter} from "next/navigation";
 
 export default function LoginForm() {
     const [isPending, startTransition] = useTransition();
@@ -26,6 +26,8 @@ export default function LoginForm() {
             }
         }
     );
+    const router = useRouter()
+
     const onSubmit = (value: z.infer<typeof LoginSchema>) => {
         startTransition(async () => {
             const response = await login(value)
@@ -33,7 +35,8 @@ export default function LoginForm() {
                 setError('Invalid username or password')
             }
             if (response.success) {
-                redirect('/')
+                localStorage.setItem('isCompany', response.success.isHasCompany)
+                router.push('/')
             }
         })
     }

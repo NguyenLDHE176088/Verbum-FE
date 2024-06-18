@@ -1,50 +1,66 @@
 "use client"
-import classes from './page.module.css';
 import DetailsForm from '@/components/project/createProject/DetailsForm';
 import QualityForm from '@/components/project/createProject/QualityForm.js';
 import TitlePage from '@/components/project/TitlePage';
 import StatusForm from '@/components/project/createProject/StatusForm';
 import { useState } from 'react';
+import { MainLayout } from "@/components/layouts/MainLayout";
+import { createProjectFromAPI } from '@/data/projects';
+import { getUser } from '@/lib/cookies'
+
 
 
 
 export default function CreateProject() {
-    const [formState, setFormState] = useState('Details');
-    const [success,setSuccess]=useState('');
-    const [detailsForm, setDetailsForm] = useState({
+    const details = {
         name: '',
         sourceLanguage: '',
         targetLanguages: [],
         dueDate: '',
         metadata: ''
-    });
-    const [statusForm, setStatusForm] = useState({
+    }
+
+    const status = {
         emailed: false,
         accepted: false,
         completed: false,
         delivered: false,
         canceled: false
-    });
+    }
 
-    const [qualityForm, setQualityForm] = useState({
+    const quality = {
         emptyTarget: { check: false, instantQA: false, ignore: false },
         extraNumber: { check: false, instantQA: false, ignore: false },
         inconsistentTarget: { check: false, instantQA: false, ignore: false },
         leadingSpace: { check: false, instantQA: false, ignore: false },
         maxSegmentLengthPercent: { check: false, instantQA: false, ignore: false, value: 130 },
-        maxTargetSegmentLengthInCharacters: { check: false, instantQA: false, ignore: false, value:1300 },
+        maxTargetSegmentLengthInCharacters: { check: false, instantQA: false, ignore: false, value: 1300 },
         missingNumber: { check: false, instantQA: false, ignore: false },
         missingSpaces: { check: false, instantQA: false, ignore: false },
         repeatedWords: { check: false, instantQA: false, ignore: false },
         spelling: { check: false, instantQA: false, ignore: false },
         identicalText: { check: false, instantQA: false, ignore: false },
-      });
+    }
 
 
-     
 
 
-      const createProjectData = () => {
+
+    const [formState, setFormState] = useState('Details');
+    const [success, setSuccess] = useState('');
+    const [detailsForm, setDetailsForm] = useState(details);
+    const [statusForm, setStatusForm] = useState(status);
+    const [qualityForm, setQualityForm] = useState(quality);
+
+
+
+
+
+    const createProjectData = async () => {
+        const user = await getUser();
+        const id = user.id;
+        console.log(id);
+
         const { name, sourceLanguage, targetLanguages, dueDate, metadata } = detailsForm;
         const { emailed, accepted, completed, delivered, canceled } = statusForm;
         const {
@@ -60,20 +76,20 @@ export default function CreateProject() {
             spelling,
             identicalText
         } = qualityForm;
-    
-    
+
+
         const markProjectAssigned = emailed ? "emailed" : accepted ? "accepted" : "Not Assigned";
         const markProjectCompleted = completed ? "completed" : delivered ? "delivered" : "Not Completed";
-        const markProjectCanceled = canceled ;
+        const markProjectCanceled = canceled;
         const body = {
             name,
-            createBy: "clwzs3ckg0000bsenh3so7ypg",  
-            description: "This is a new project", 
-            status: "Active",  
-            onwer: "clwzs3ckg0000bsenh3so7ypg",  
+            createBy: id,
+            description: "This is a new project",
+            status: "Active",
+            onwer: id,
             sourceLanguage,
-            dueDate: new Date(dueDate).toISOString(), 
-            clientName: "Client A",  
+            dueDate: new Date(dueDate).toISOString(),
+            clientName: "Client A",
             metadata,
             markProjectAssigned,
             markProjectCompleted,
@@ -102,39 +118,29 @@ export default function CreateProject() {
             spellingIgnore: spelling.ignore,
             targetTextIdenticalQA: identicalText.check,
             targetTextIdenticalIgnore: identicalText.ignore,
-            targetLanguages: targetLanguages
+            targetLanguages: targetLanguages,
+            progress: 100
         };
-    
+
         return body;
     };
 
 
     const createProject = async () => {
-        const projectData = createProjectData();
-    
-    
-        try {
-            const response = await fetch('http://localhost:9999/projects', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(projectData)
-            });
-    
-            if (!response.ok) {
-                throw new Error('Something went wrong!');
-            }
-    
-            const result = await response.json();
-            console.log('Project created successfully', result);
+        const projectData = await createProjectData();
+        console.log(projectData);
+        const result = await createProjectFromAPI(projectData);
+        if (result.success) {
             setSuccess('Project created successfully!');
-        } catch (error) {
-            console.error('Error:', error);
+            setDetailsForm(details);
+            setStatusForm(status);
+            setQualityForm(quality);
+        } else {
+            console.error('Error deleting projects:', result.error);
         }
     };
-    
-  
+
+
 
     const handleOnClickFormState = (state) => {
         setFormState(state);
@@ -159,65 +165,89 @@ export default function CreateProject() {
                 ...prevState[field],
                 [subfield]: type === 'checkbox' ? checked : value,
             };
-    
+
             // Nếu subfield là 'check' và checked là true, cập nhật tất cả các subfield khác thành true
-            if (subfield === 'check' && type === 'checkbox' && checked) {
-                updatedField = Object.keys(updatedField).reduce((acc, key) => {
-                    acc[key] = true;
-                    return acc;
-                }, {});
-                // Đảm bảo giữ lại giá trị của 'value' nếu nó tồn tại
-                if (prevState[field].hasOwnProperty('value')) {
-                    updatedField['value'] = prevState[field]['value'];
+            if (subfield === 'check' && type === 'checkbox') {
+                if (checked) {
+                    updatedField = Object.keys(updatedField).reduce((acc, key) => {
+                        acc[key] = true;
+                        return acc;
+                    }, {});
+                    // Đảm bảo giữ lại giá trị của 'value' nếu nó tồn tại
+                    if (prevState[field].hasOwnProperty('value')) {
+                        updatedField['value'] = prevState[field]['value'];
+                    }
+                } else {
+                    updatedField = Object.keys(updatedField).reduce((acc, key) => {
+                        acc[key] = false;
+                        return acc;
+                    }, {});
+                    // Đảm bảo giữ lại giá trị của 'value' nếu nó tồn tại
+                    if (prevState[field].hasOwnProperty('value')) {
+                        updatedField['value'] = prevState[field]['value'];
+                    }
                 }
             }
-    
+
             return {
                 ...prevState,
                 [field]: updatedField,
             };
         });
     };
-    
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
         createProject();
-       
+
     };
 
     return (
-        <>
-            <TitlePage title="Create project" />
 
-            <div className={classes.container}>
-                <div className={classes.formContainer}>
-                    <div className={classes.sidebar}>
-                        <p onClick={() => handleOnClickFormState('Details')}
-                            className={formState === "Details" ? classes.activeTitle : classes.inActiveTitle}>Project Details</p>
-                        <p onClick={() => handleOnClickFormState('Status')}
-                            className={formState === "Status" ? classes.activeTitle : classes.inActiveTitle}>Project Status Automation</p>
-                        <p onClick={() => handleOnClickFormState('Quality')}
-                            className={formState === "Quality" ? classes.activeTitle : classes.inActiveTitle}>Quality Assurance</p>
-                    </div>
-                    <div className={classes.form}>
-                        <form onSubmit={handleSubmit}>
-                            {formState === "Details" && (
-                                <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
-                            )}
-                            {formState === "Status" && (
-                                <StatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
-                            )}
-                            {formState === "Quality" && (
-                                <QualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
-                            )}
-                            <button type="submit" className={classes.button}>Create project</button>
-                            {success && <p className={classes.successMessage}>{success}</p>}
-                        </form>
+        <MainLayout>
+            <>
+                <div className="w-full flex flex-col items-center">
+                    <div className="flex flex-row overflow-hidden w-[95%]" >
+                        <div className="p-4 rounded-lg border-black border-solid border w-[40%]" >
+                            <p
+                                onClick={() => handleOnClickFormState('Details')}
+                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Details" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                            >
+                                Project Details
+                            </p>
+                            <p
+                                onClick={() => handleOnClickFormState('Status')}
+                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Status" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                            >
+                                Project Status Automation
+                            </p>
+                            <p
+                                onClick={() => handleOnClickFormState('Quality')}
+                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Quality" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                            >
+                                Quality Assurance
+                            </p>
+                        </div>
+                        <div className="ml-[5%] rounded-[10px] border border-black flex-1 p-[20px]">
+                            <form onSubmit={handleSubmit}>
+                                {formState === "Details" && (
+                                    <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
+                                )}
+                                {formState === "Status" && (
+                                    <StatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
+                                )}
+                                {formState === "Quality" && (
+                                    <QualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
+                                )}
+                                <button type="submit" className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Create project</button>
+                                {success && <p className="text-red-500 mt-2">{success}</p>}
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </>
+            </>
+        </MainLayout>
     );
 }
 

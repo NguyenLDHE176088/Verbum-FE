@@ -1,7 +1,7 @@
 'use client'
 
 interface RegisterFormProps {
-    name: string
+    username: string
     email: string
     password: string
     confirmPassword: string
@@ -30,6 +30,7 @@ export async function register(body: RegisterFormProps) {
 }
 
 export async function login(body: LoginFormProps) {
+    console.log(body);
     const response = await fetch('http://localhost:9999/auth/login', {
         method: 'POST',
         credentials: 'include',

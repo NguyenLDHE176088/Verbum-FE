@@ -15,23 +15,15 @@ import SortIcon from '@mui/icons-material/Sort';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/system';
 import { linearProgressClasses } from '@mui/material/LinearProgress';
-import classes from './TranslationTable.module.css';
+
 import Link from 'next/link';
+import { format } from 'date-fns';
+import {getAllProjects,deleteProjectsFromAPI} from '@/data/projects'
 
-const translations = [
-    { id: 1, name: 'EN TO VN', progress: 70, created: '10/08/2024', due: '20/05/2025', status: 'In-progress' },
-    { id: 2, name: 'JP TO VN', progress: 100, created: '11/09/2024', due: '21/04/2025', status: 'Finished' },
-    { id: 3, name: 'ES TO VN', progress: 80, created: '12/07/2024', due: '22/07/2025', status: 'In-progress' },
-    { id: 4, name: 'CN TO VN', progress: 100, created: '13/06/2024', due: '23/02/2025', status: 'Finished' },
-    { id: 5, name: 'EN TO VN', progress: 30, created: '10/08/2024', due: '20/05/2025', status: 'In-progress' },
-    { id: 6, name: 'JP TO VN', progress: 20, created: '11/09/2024', due: '21/04/2025', status: 'In-progress' },
-    { id: 7, name: 'ES TO VN', progress: 10, created: '12/07/2024', due: '22/07/2025', status: 'In-progress' },
-    { id: 8, name: 'CN TO VN', progress: 0, created: '13/06/2024', due: '23/02/2025', status: 'In-progress' },
-
-];
 
 export default function TranslationTable() {
-    const [translationsBackUp, setTranslationsBackUp] = useState(translations);
+    const [translations, setTranslations] = useState([]);
+    const [translationsBackUp, setTranslationsBackUp] = useState([]);
     const [sortBy, setSortBy] = useState('All');
     const [open, setOpen] = useState(false);
     const [anchorElfilter, setAnchorElfilter] = useState(null);
@@ -42,6 +34,21 @@ export default function TranslationTable() {
     const [ids, setIds] = useState([]);
     const dropdownRefSort = useRef(null);
     const dropdownRefFilter = useRef(null);
+
+    const fetchProjects = async () => {
+        const result = await getAllProjects();
+        if (result.success) {
+            setTranslationsBackUp(result.success.data);
+            setTranslations(result.success.data);
+        } else {
+            console.error('Error fetching projects:', result.error);
+        }
+    };
+
+    useEffect(() => {
+
+        fetchProjects();
+    }, []);
 
     const CustomLinearProgress = styled(LinearProgress)(({ theme, value }) => ({
         height: 10,
@@ -55,25 +62,16 @@ export default function TranslationTable() {
     }));
 
     const deleteProject = async () => {
-        try {
-            const response = await fetch('http://localhost:9999/projects', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ids: [10, 11] })
-            });
-    
-            if (!response.ok) {
-                throw new Error('Something went wrong!');
-            }
-    
-            const result = await response.json();
-            console.log('Delete successful', result);
-        } catch (error) {
-            console.error('Error:', error);
+        const result = await deleteProjectsFromAPI(ids);
+        if (result.success) {
+            fetchProjects();
+            setIds([]);
+        } else {
+            console.error('Error deleting projects:', result.error);
         }
     };
+
+    
 
     // Xử lý thay đổi trang
     const handleChangePage = (event, newPage) => {
@@ -137,16 +135,16 @@ export default function TranslationTable() {
         if (sortBy === 'Created') {
             setTranslationsBackUp(
                 [...translations].sort((a, b) => {
-                    const dateA = new Date(a.created.split('/').reverse().join('-'));
-                    const dateB = new Date(b.created.split('/').reverse().join('-'));
+                    const dateA = new Date(a.createdAt.split('/').reverse().join('-'));
+                    const dateB = new Date(b.createdAt.split('/').reverse().join('-'));
                     return status.toLowerCase() === 'Ascending'.toLowerCase()? dateA - dateB : dateB - dateA;
                 }));
         }
         if (sortBy === 'Due') {
             setTranslationsBackUp(
                 [...translations].sort((a, b) => {
-                    const dateA = new Date(a.due.split('/').reverse().join('-'));
-                    const dateB = new Date(b.due.split('/').reverse().join('-'));
+                    const dateA = new Date(a.dueDate.split('/').reverse().join('-'));
+                    const dateB = new Date(b.dueDate.split('/').reverse().join('-'));
                     return status.toLowerCase() === 'Ascending'.toLowerCase()? dateA - dateB : dateB - dateA;
                 }));
         }
@@ -207,11 +205,11 @@ export default function TranslationTable() {
 
 
     return (
-        <div className={classes.table_container}>
-            <div className={classes.table}>
-                <Toolbar className={classes.table_toolbar}>
+        <div className="flex justify-center">
+            <div className="w-[95%] rounded-[10px] border border-[#7C7C7C]">
+                <Toolbar className="flex justify-between">
                     <TextField
-                        className={classes.search_input}
+                        className="rounded-[10px] border border-[#737373]"
                         variant="outlined"
                         placeholder="Search By Name"
                         size="small"
@@ -227,7 +225,7 @@ export default function TranslationTable() {
                     <FormControl sx={{ m: 1, width: 300 }}>
                         <Select
                             onChange={handleSortChange}
-                            className={classes.filter_select}
+                            className="rounded-[10px] border border-[#737373]"
                             variant="outlined"
                             size="small"
                             defaultValue="All"
@@ -241,10 +239,10 @@ export default function TranslationTable() {
 
                         </Select>
                     </FormControl>
-                    <div className={classes.icon_buttons}>
+                    <div className="w-1/2 flex justify-between">
                         <Tooltip title="Sort">
-                            <Box ref={dropdownRefSort} className={classes.option} onClick={handleSortClick} >
-                                <SortIcon style={{ marginRight: '15px', }} />
+                            <Box ref={dropdownRefSort} className="cursor-pointer flex items-center px-[20px] py-[5px] bg-[#F3F3F3] rounded-[50px]" onClick={handleSortClick} >
+                                <SortIcon className="mr-[15px]" />
                                 <Typography variant="body2">Sort</Typography>
                             </Box>
                         </Tooltip>
@@ -265,8 +263,8 @@ export default function TranslationTable() {
                             <MenuItem onClick={() => handleCloseSort("Ascending")} value="Ascending">Ascending</MenuItem>
                         </Menu>
                         <Tooltip title="Filter">
-                            <Box ref={dropdownRefFilter} className={classes.option} onClick={handleClickFilter} >
-                                <FilterListIcon style={{ marginRight: '15px', }} />
+                            <Box ref={dropdownRefFilter} className="cursor-pointer flex items-center px-[20px] py-[5px] bg-[#F3F3F3] rounded-[50px]" onClick={handleClickFilter} >
+                                <FilterListIcon className="mr-[15px]" />
                                 <Typography variant="body2">Filter</Typography>
                             </Box>
                         </Tooltip>
@@ -287,17 +285,17 @@ export default function TranslationTable() {
                             <MenuItem onClick={() => handleCloseFilter("Finished")} value="Finished">Finished</MenuItem>
                         </Menu>
                         <Tooltip title="Delete">
-                            <Box className={classes.option} onClick={handleClickDelete} >
-                                <DeleteIcon style={{ marginRight: '15px', color: 'red' }} />
+                            <Box className="cursor-pointer flex items-center px-[20px] py-[5px] bg-[#F3F3F3] rounded-[50px]" onClick={handleClickDelete} >
+                                <DeleteIcon className="mr-[15px] text-[red]" />
                                 <Typography variant="body2">Delete</Typography>
                             </Box>
                         </Tooltip>
                         <Tooltip title="Add">
-                            <Link href={"/projects/createProject"} >
+                            <Link href={"/projects/create"} >
 
-                                <Box className={classes.optionAdd} >
-                                    <Box className={classes.iconAdd}  >
-                                        <AddIcon style={{ color: '#FF9300', fontSize: '15px' }} />
+                                <Box className="cursor-pointer flex bg-[#FF9300] justify-center items-center rounded-tr-[10px]" >
+                                    <Box className="m-[5px] flex items-center p-[5px] bg-[#F3F3F3] rounded-full"  >
+                                        <AddIcon  className="text-[#FF9300] text-[15px]" />
                                     </Box>
                                 </Box>
 
@@ -312,12 +310,12 @@ export default function TranslationTable() {
                                 <TableCell padding="checkbox">
                                     <Checkbox />
                                 </TableCell>
-                                <TableCell className={classes.table_head_cell}>#</TableCell>
-                                <TableCell className={classes.table_head_cell}>Name</TableCell>
-                                <TableCell className={classes.table_head_cell}>Progress</TableCell>
-                                <TableCell className={classes.table_head_cell}>Created</TableCell>
-                                <TableCell className={classes.table_head_cell}>Due</TableCell>
-                                <TableCell className={classes.table_head_cell}>Status</TableCell>
+                                <TableCell className="font-bold">#</TableCell>
+                                <TableCell className="font-bold">Name</TableCell>
+                                <TableCell className="font-bold">Progress</TableCell>
+                                <TableCell className="font-bold">Created</TableCell>
+                                <TableCell className="font-bold">Due</TableCell>
+                                <TableCell className="font-bold">Status</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -336,8 +334,8 @@ export default function TranslationTable() {
                                         <CustomLinearProgress variant="determinate" value={row.progress}
                                             className="linear-progress" />
                                     </TableCell>
-                                    <TableCell>{row.created}</TableCell>
-                                    <TableCell>{row.due}</TableCell>
+                                    <TableCell> {row.createdAt ? format(new Date(row.createdAt), 'dd/MM/yyyy') : 'Invalid Date'}</TableCell>
+                                    <TableCell> {row.dueDate ? format(new Date(row.dueDate), 'dd/MM/yyyy') : 'Invalid Date'}</TableCell>
                                     <TableCell>{row.status}</TableCell>
                                 </TableRow>
                             ))}
@@ -362,7 +360,7 @@ export default function TranslationTable() {
                     <DialogTitle>Confirmation</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {names.join(", ")} will be moved to recycle bin and deleted forever after 30 days.
+                            {ids.join(", ")} will be moved to recycle bin and deleted forever after 30 days.
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>

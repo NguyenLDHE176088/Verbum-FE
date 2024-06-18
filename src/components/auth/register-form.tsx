@@ -22,7 +22,7 @@ export default function RegisterForm() {
     const form = useForm<z.infer<typeof RegisterSchema>>({
             resolver: zodResolver(RegisterSchema),
             defaultValues: {
-                name: '',
+                username: '',
                 email: '',
                 password: '',
                 confirmPassword: ''
@@ -32,7 +32,7 @@ export default function RegisterForm() {
     const onSubmit = (value: z.infer<typeof RegisterSchema>) => {
         startTransaction(async () => {
             const body = {
-                name: value.name,
+                username: value.username,
                 email: value.email,
                 password: value.password,
                 confirmPassword: value.confirmPassword
@@ -56,13 +56,13 @@ export default function RegisterForm() {
                 </div>
                 <FormField control={form.control} render={({field}) => (
                     <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>User Name</FormLabel>
                         <FormControl>
                             <Input placeholder="John Doe" {...field} />
                         </FormControl>
                         <FormMessage/>
                     </FormItem>
-                )} name='name'/>
+                )} name='username'/>
 
                 <FormField control={form.control} render={({field}) => (
                     <FormItem>
