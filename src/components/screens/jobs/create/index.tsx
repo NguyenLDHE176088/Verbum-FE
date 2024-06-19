@@ -27,7 +27,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { UserList } from "../components/userlist";
 import { User } from "@/models/users";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const MOCK_TARGET_LANGUAGES = [
   {
@@ -68,7 +68,7 @@ const MOCK_TARGET_LANGUAGES = [
     name: "French",
     user: [
       {
-        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d5c",
+        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d7c",
         firstName: "Thien Phuoc",
         lastName: "Duong",
         username: "thienphuoc",
@@ -77,7 +77,7 @@ const MOCK_TARGET_LANGUAGES = [
         status: "Active",
       },
       {
-        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d6c",
+        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d8c",
         firstname: "Quang Huy",
         lastName: "Tran",
         username: "tranhuy",
@@ -117,31 +117,15 @@ const FormSchema = z.object({
   duedate: z.date(),
 });
 
-type SelectedUsersState = {
-  [key: number]: User[];
-};
-
 export function CreateJobScreen() {
   const [targetLanguages, setTargetLanguages] = useState([]);
-  const [checkedStates, setCheckedStates] = useState({});
-  const [selectedUsers, setSelectedUsers] = useState<SelectedUsersState>({});
-  const [openPopovers, setOpenPopovers] = useState<boolean[]>([]);
-  const [checkedUsers, setCheckedUsers] = useState<{ [key: string]: boolean }>(
-    {}
-  );
+  const [checkedLanguages, setCheckedLanguages] = useState({});
+  const [selectedUsers, setSelectedUsers] = useState({});
   const router = useRouter();
 
   useEffect(() => {
     // Simulate fetching target languages from API
     setTargetLanguages(MOCK_TARGET_LANGUAGES);
-    // Initialize checked states and openPopovers states
-    setCheckedStates(
-      MOCK_TARGET_LANGUAGES.reduce((acc, _, index) => {
-        acc[index] = false;
-        return acc;
-      }, {})
-    );
-    setOpenPopovers(MOCK_TARGET_LANGUAGES.map(() => false));
   }, []);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -152,59 +136,55 @@ export function CreateJobScreen() {
     },
   });
 
-  const handleCheckboxChange = (index: number) => {
-    setCheckedStates((prev) => {
-      const newCheckedStates = {
-        ...prev,
-        [index]: !prev[index],
-      };
-
-      const checkedLanguages = targetLanguages.filter(
-        (_, i) => newCheckedStates[i]
-      );
-      form.setValue("target_languages", checkedLanguages);
-
-      return newCheckedStates;
-    });
+  const handleCheckboxChange = (id) => {
+    setCheckedLanguages((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
-  const handlePopoverToggle = (index: number, isOpen: boolean) => {
-    setOpenPopovers((prev) => {
-      const newOpenPopovers = [...prev];
-      newOpenPopovers[index] = isOpen;
-      return newOpenPopovers;
-    });
+  const handleUserSelection = (languageId, users) => {
+    setSelectedUsers((prev) => ({
+      ...prev,
+      [languageId]: users,
+    }));
   };
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    const userIds = Object.values(selectedUsers)
-      .flat()
-      .map((user) => user.id);
-    const payload = {
-      userIds,
-      name: data.file.name.split(".")[0],
-      targetLanguageId: data.target_languages[0].id,
-      projectId: 1, // replace with actual project id
-      dueDate: format(data.duedate, "yyyy-MM-dd"),
-      fileExtention: `.${data.file.name.split(".").pop()}`,
-      status: "new",
-    };
+  const onSubmit = async (data) => {
+    const jobsPayload = [];
 
+    Object.keys(checkedLanguages).forEach((languageId) => {
+      if (checkedLanguages[languageId]) {
+        const jobPayload = {
+          userIds: selectedUsers[languageId]?.map((user) => user.id) || [],
+          name: data.file.name.split(".")[0],
+          targetLanguageId: languageId,
+          projectId: 1, // replace with actual project id
+          dueDate: format(data.duedate, "yyyy-MM-dd"),
+          fileExtention: `.${data.file.name.split(".").pop()}`,
+          status: "new",
+        };
+
+        jobsPayload.push(jobPayload);
+      }
+    });
+    console.log(JSON.stringify(jobsPayload));
     const response = await fetch("http://localhost:9999/jobs/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(jobsPayload),
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    window.alert('Request was successful!');
-    router.push('/jobs');
-  }
+    window.alert("Request was successful!");
+    router.push("/jobs");
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
@@ -235,43 +215,35 @@ export function CreateJobScreen() {
             render={() => (
               <FormItem>
                 <Checkbox
-                  id={`target_languages[${index}].name`}
                   className="mr-3"
-                  checked={checkedStates[index]}
-                  onCheckedChange={() => handleCheckboxChange(index)}
+                  checked={!!checkedLanguages[language.id]}
+                  onCheckedChange={() => handleCheckboxChange(language.id)}
                 />
                 <FormLabel>{language.name}</FormLabel>
                 <FormControl>
-                  <Popover
-                    open={openPopovers[index]}
-                    onOpenChange={(isOpen) =>
-                      handlePopoverToggle(index, isOpen)
-                    }
-                  >
+                  <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className="justify-start ml-3"
-                        disabled={!checkedStates[index]}
+                        disabled={!checkedLanguages[language.id]}
                       >
-                        {selectedUsers[index] ? (
-                          selectedUsers[index]
-                            .map((user) => user.lastName + " " + user.firstName)
-                            .join(", ")
-                        ) : (
-                          <>Choose linguists</>
-                        )}
+                        {selectedUsers[language.id]?.length > 0
+                          ? `${selectedUsers[language.id]
+                              .map(
+                                (user) => user.lastName + " " + user.firstName
+                              )
+                              .join(", ")}`
+                          : "Choose linguists"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[200px] p-0" align="start">
                       <UserList
-                        setOpen={(isOpen) => handlePopoverToggle(index, isOpen)}
-                        initialSelectedUsers={selectedUsers[index]}
-                        setSelectedUsers={setSelectedUsers}
-                        setCheckedUsers={setCheckedUsers}
-                        checkedUsers={checkedUsers}
-                        index={index}
                         users={language.user}
+                        selectedUsers={selectedUsers[language.id] || []}
+                        onUserSelection={(users) =>
+                          handleUserSelection(language.id, users)
+                        }
                       />
                     </PopoverContent>
                   </Popover>
