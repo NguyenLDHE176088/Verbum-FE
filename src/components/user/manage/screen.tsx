@@ -24,7 +24,7 @@ import * as React from "react";
 import { User } from "@/models/users";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { deleteUser, getAllUsers } from "@/data/users";
+import { deleteUser, getUsers } from "@/data/users";
 
 export default function Index() {
   const [data, setData] = React.useState<User[]>([]);
@@ -40,7 +40,7 @@ export default function Index() {
   // Fetch data on component mount
   React.useEffect(() => {
     const fetchData = async () => {
-      const result = await getAllUsers();
+      const result = await getUsers();
       if (result.success) {
         setData(result.success);
       }
@@ -68,7 +68,7 @@ export default function Index() {
   });
 
   const handleEdit = () => {
-    // Logic for edit action
+      router.push(`/users/edit/${table.getFilteredSelectedRowModel().rows[0].original.id}`);
   };
 
   const handleDelete = () => {
@@ -81,12 +81,13 @@ export default function Index() {
     deleteUser(
       table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
     );
+    router.refresh();
   };
 
   return (
-    <div className="w-full rounded-md border m-2">
+    <div className="w-full rounded-md border">
       <div className="flex justify-between items-center w-full">
-        <div className="flex items-center pl-4 py-4 space-x-2">
+        <div className="flex items-center pl-2 py-4 space-x-2">
           <Input
             placeholder="Filter names..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -110,8 +111,8 @@ export default function Index() {
           </Button>
         </div>
       </div>
-      <div className="mx-4 border rounded">
-        <Table className="mx-4 my-2">
+      <div className="mx-2 border rounded">
+        <Table className="my-2">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
