@@ -75,13 +75,10 @@ export default function Index() {
     alert(
       "Do you want to delete the selected users?\nThis action cannot be undone."
     );
-    console.log(
-      table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
-    );
     deleteUser(
       table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
     );
-    router.refresh();
+    window.location.reload
   };
 
   return (
