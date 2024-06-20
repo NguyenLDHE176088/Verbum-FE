@@ -1,8 +1,17 @@
 "use client";
 
-export async function getAllUsers() {
+import { getUserIdFromCookie } from "@/lib/auth";
+
+export async function getUsers() {
   try {
-    const response = await fetch("http://localhost:9999/users/", {method: "GET"});
+    const userId = await getUserIdFromCookie();
+
+    const response = await fetch(
+      `http://localhost:9999/users/?userId=${userId}`,
+      {
+        method: "GET",
+      }
+    );
 
     const data = await response.json();
 
@@ -56,6 +65,51 @@ export async function deleteUser(id: string[]) {
     }
 
     alert("User deleted successfully!");
+    return { success: data };
+  } catch (error) {
+    alert(`Error: ${error.message || "An error occurred"}`);
+    return { error: { message: error.message } };
+  }
+}
+
+export async function getUser(id: string) {
+  try {
+    const response = await fetch(`http://localhost:9999/users/${id}`, {
+      method: "GET",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(`Error: ${data.message || "An error occurred"}`);
+      return { error: data };
+    }
+
+    return { success: data };
+  } catch (error) {
+    alert(`Error: ${error.message || "An error occurred"}`);
+    return { error: { message: error.message } };
+  }
+}
+
+export async function updateUser(id: string, body: any) {
+  try {
+    const response = await fetch(`http://localhost:9999/users/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(`Error: ${data.message || "An error occurred"}`);
+      return { error: data };
+    }
+
+    alert("User updated successfully!");
     return { success: data };
   } catch (error) {
     alert(`Error: ${error.message || "An error occurred"}`);

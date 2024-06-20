@@ -1,7 +1,7 @@
 import ProjectInfo from '@/components/project/detail/ProjectInfo'
 import { JobTable } from '@/components/project/detail/Job/JobTable';
 import { ReferenceTable } from '@/components/project/detail/Reference/ReferenceTable';
-import { MainLayout } from '@/components/layouts/MainLayout';
+import { MainLayout } from "@/components/layouts/MainLayout";
 
 const getJobData = () => {
     const data = [
@@ -111,10 +111,11 @@ const getReferenceData = () => {
     return data;
 }
 
-export default function ProjectDetail() {
+export default function ProjectDetail({params}) {
+  const projectId = params.detail;
     return (
         <MainLayout>
-            <ProjectInfo id={1}/>
+            <ProjectInfo id={projectId}/>
             <JobTable data={getJobData() || []} />
             <ReferenceTable data={getReferenceData()||[]} />
         </MainLayout>

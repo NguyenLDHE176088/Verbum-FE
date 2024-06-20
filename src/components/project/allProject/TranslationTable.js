@@ -18,7 +18,7 @@ import { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import Link from 'next/link';
 import { format } from 'date-fns';
-import {getAllProjects,deleteProjectsFromAPI} from '@/data/projects'
+import {getAllProjects,deleteProjectsFromAPI} from '@/data/projects';
 
 
 export default function TranslationTable() {
@@ -329,7 +329,7 @@ export default function TranslationTable() {
                                         />
                                     </TableCell>
                                     <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.name}</TableCell>
+                                    <TableCell className="underline"><Link href={`/projects/${row.id}`}>{row.name}</Link></TableCell>
                                     <TableCell className="table-cell-progress">
                                         <CustomLinearProgress variant="determinate" value={row.progress}
                                             className="linear-progress" />

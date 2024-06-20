@@ -50,7 +50,7 @@ export default function LoginForm() {
                 </div>
                 <FormField control={form.control} render={({field}) => (
                     <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>Username or email</FormLabel>
                         <FormControl>
                             <Input placeholder="example@gmail.com" {...field} />
                         </FormControl>
