@@ -1,3 +1,4 @@
+"use client"
 import {
     ResizablePanel,
     ResizablePanelGroup,
@@ -6,25 +7,34 @@ import { Button } from "@/components/ui/button"
 import classes from './ProjectInfo.module.css';
 import { Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getProjectFromAPI } from '@/data/projects'; 
+import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 
-const getProjectInfoById = (id) => {
-    const data = {
-        projectName: 'En to VN',
-        createBy: 'truongpdhe170417@fpt.com.vn',
-        created: 'May 13 21:00',
-        status: 'new',
-        sourceLanguage: [
-            "EN"
-        ],
-        targetLanguage: [
-            "VN", "JP"
-        ]
-    }
-    return data;
-}
+
+
 
 export default function ProjectInfo({ id }) {
-    const data = getProjectInfoById(id);
+
+    const [data, setData]= useState({});
+
+    const getProjectInfoById = async (projectId) => {
+        try {
+            const result = await getProjectFromAPI(projectId);
+            if (result.success) {
+                setData(result.success.data);
+                console.log(result.success.data);
+            } else {
+                console.error('Error fetching project:', result.error);
+            }
+        } catch (error) {
+            console.error('Error fetching project info:', error);
+        }
+    };
+
+    useEffect(() => {
+        getProjectInfoById(id);
+    }, [id]);
     return (
         <>
             <div className={classes.projectInfoHeading}>
@@ -58,7 +68,7 @@ export default function ProjectInfo({ id }) {
                             </div>
                             <div className={classes.displayObject}>
                                 <div>Created:</div>
-                                <div>{data.created}</div>
+                                <div>{data.createdAt ? format(new Date(data.createdAt ), 'dd/MM/yyyy') : 'Invalid Date'}</div>
                             </div>
                             <div className={classes.displayObject}>
                                 <div>Status: </div>
@@ -71,11 +81,8 @@ export default function ProjectInfo({ id }) {
                             <div className={classes.displayObject}>
                                 <div>Source language: </div>
                                 <div className="flex">{
-                                    data.sourceLanguage?.map(language => (
-                                        <span key={language.valueOf}>
-                                            <Badge variant="secondary" >{language}</Badge>
-                                        </span>
-                                    )) || <p>none</p>
+                                    data.sourceLanguage
+                                     || <p>none</p>
                                 }</div>
                             </div>
                             <div className={classes.displayObject}>

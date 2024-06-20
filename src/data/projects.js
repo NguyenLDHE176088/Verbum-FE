@@ -16,6 +16,22 @@ export async function getAllProjects() {
     }
 }
 
+export async function getProjectFromAPI(id) {
+    try {
+        const response = await fetch(`http://localhost:9999/projects/${id}`);
+        const data = await response.json();
+        if (!response.ok) {
+            alert(`Error: ${data.message || "An error occurred"}`);
+            return { error: data };
+        }
+
+        return { success: data };
+    } catch (error) {
+        alert(`Error: ${error.message || "An error occurred"}`);
+        return { error: { message: error.message } };
+    }
+}
+
 export async function createProjectFromAPI(projectData) {
     try {
         const response = await fetch('http://localhost:9999/projects', {
@@ -63,3 +79,5 @@ export async function deleteProjectsFromAPI(ids) {
         return { error: { message: error.message } };
     }
 }
+
+
