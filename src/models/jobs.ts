@@ -7,4 +7,5 @@ export type Job = {
   fileExtension: string;
   targetLanguageId: string;
   status: "new" | "in_progress" | "completed" | "overdue" | "canceled";
+  documentUrl: string;
 };
