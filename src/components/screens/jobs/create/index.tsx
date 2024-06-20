@@ -157,13 +157,17 @@ export function CreateJobScreen() {
     const jobsPayload = [];
     const storage = getStorage(app);
 
-    const storageRef = ref(storage, data.file.name.split(".")[0]);
+    const storageRef = ref(storage, data.file.name);
 
     // 'file' comes from the Blob or File API
     const file = data.file; // replace with your file input's name attribute
 
+    const metadata = {
+      contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    };
+
     // Upload the file to the path 'some-child'
-    const snapshot = await uploadBytes(storageRef, file);
+    const snapshot = await uploadBytes(storageRef, file, metadata);
 
     console.log("Uploaded a blob or file!", snapshot);
 
@@ -216,7 +220,7 @@ export function CreateJobScreen() {
               <FormControl>
                 <Input
                   type="file"
-                  accept=".jpg, .jpeg, .png, .pdf"
+                  accept=".docx"
                   onChange={(event) =>
                     onChange(event.target.files && event.target.files[0])
                   }
