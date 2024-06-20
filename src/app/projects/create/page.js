@@ -7,11 +7,13 @@ import { useState } from 'react';
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { createProjectFromAPI } from '@/data/projects';
 import { getUser } from '@/lib/cookies'
+import { useRouter } from 'next/navigation';
 
 
 
 
 export default function CreateProject() {
+    const router = useRouter();
     const details = {
         name: '',
         sourceLanguage: '',
@@ -119,7 +121,7 @@ export default function CreateProject() {
             targetTextIdenticalQA: identicalText.check,
             targetTextIdenticalIgnore: identicalText.ignore,
             targetLanguages: targetLanguages,
-            progress: 100
+            progress: 0
         };
 
         return body;
@@ -135,6 +137,7 @@ export default function CreateProject() {
             setDetailsForm(details);
             setStatusForm(status);
             setQualityForm(quality);
+            router.push('/projects');
         } else {
             console.error('Error deleting projects:', result.error);
         }
