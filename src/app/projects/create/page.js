@@ -7,54 +7,47 @@ import { useState } from 'react';
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { createProjectFromAPI } from '@/data/projects';
 import { getUser } from '@/lib/cookies'
+import { useRouter } from 'next/navigation';
 
 
 
+const details = {
+    name: '',
+    sourceLanguage: '',
+    targetLanguages: [],
+    dueDate: '',
+    metadata: ''
+}
+
+const status = {
+    emailed: false,
+    accepted: false,
+    completed: false,
+    delivered: false,
+    canceled: false
+}
+
+const quality = {
+    emptyTarget: { check: false, instantQA: false, ignore: false },
+    extraNumber: { check: false, instantQA: false, ignore: false },
+    inconsistentTarget: { check: false, instantQA: false, ignore: false },
+    leadingSpace: { check: false, instantQA: false, ignore: false },
+    maxSegmentLengthPercent: { check: false, instantQA: false, ignore: false, value: 130 },
+    maxTargetSegmentLengthInCharacters: { check: false, instantQA: false, ignore: false, value: 1300 },
+    missingNumber: { check: false, instantQA: false, ignore: false },
+    missingSpaces: { check: false, instantQA: false, ignore: false },
+    repeatedWords: { check: false, instantQA: false, ignore: false },
+    spelling: { check: false, instantQA: false, ignore: false },
+    identicalText: { check: false, instantQA: false, ignore: false },
+}
 
 export default function CreateProject() {
-    const details = {
-        name: '',
-        sourceLanguage: '',
-        targetLanguages: [],
-        dueDate: '',
-        metadata: ''
-    }
-
-    const status = {
-        emailed: false,
-        accepted: false,
-        completed: false,
-        delivered: false,
-        canceled: false
-    }
-
-    const quality = {
-        emptyTarget: { check: false, instantQA: false, ignore: false },
-        extraNumber: { check: false, instantQA: false, ignore: false },
-        inconsistentTarget: { check: false, instantQA: false, ignore: false },
-        leadingSpace: { check: false, instantQA: false, ignore: false },
-        maxSegmentLengthPercent: { check: false, instantQA: false, ignore: false, value: 130 },
-        maxTargetSegmentLengthInCharacters: { check: false, instantQA: false, ignore: false, value: 1300 },
-        missingNumber: { check: false, instantQA: false, ignore: false },
-        missingSpaces: { check: false, instantQA: false, ignore: false },
-        repeatedWords: { check: false, instantQA: false, ignore: false },
-        spelling: { check: false, instantQA: false, ignore: false },
-        identicalText: { check: false, instantQA: false, ignore: false },
-    }
-
-
-
-
-
     const [formState, setFormState] = useState('Details');
     const [success, setSuccess] = useState('');
     const [detailsForm, setDetailsForm] = useState(details);
     const [statusForm, setStatusForm] = useState(status);
     const [qualityForm, setQualityForm] = useState(quality);
-
-
-
-
+    const router = useRouter();
 
     const createProjectData = async () => {
         const user = await getUser();
@@ -119,7 +112,7 @@ export default function CreateProject() {
             targetTextIdenticalQA: identicalText.check,
             targetTextIdenticalIgnore: identicalText.ignore,
             targetLanguages: targetLanguages,
-            progress: 100
+            progress: 0,
         };
 
         return body;
@@ -135,6 +128,7 @@ export default function CreateProject() {
             setDetailsForm(details);
             setStatusForm(status);
             setQualityForm(quality);
+            router.push('/projects');
         } else {
             console.error('Error deleting projects:', result.error);
         }
