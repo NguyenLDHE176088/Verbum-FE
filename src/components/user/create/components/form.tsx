@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Language } from "@/models/languages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { Combobox } from "@/components/user/create/components/combobox";
 import { Permissions } from "./Permissions";
 import LanguageSelector from "./languageSelector";
 import { useRouter } from "next/navigation";
+import { getUserIdFromCookie } from "@/lib/auth";
+
 interface CreateUserProps {
   languages: Language[];
   setLanguages: React.Dispatch<React.SetStateAction<Language[]>>;
@@ -19,7 +21,7 @@ export const Form: React.FC<CreateUserProps> = ({
   setLanguages,
 }) => {
   const router = useRouter();
-
+  const [creatorId, setCreatorId] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
@@ -39,7 +41,15 @@ export const Form: React.FC<CreateUserProps> = ({
   const [selectedTargetLanguages, setSelectedTargetLanguages] = useState<
     string[]
   >([]);
+  
+  async function getCreatorId() {
+    const result = await getUserIdFromCookie();
+    setCreatorId(result);
+  }
 
+  useEffect(() => {
+    getCreatorId();
+  }, []);
   const handleRoleChange = (role: string) => {
     setRoleName(role);
     setSelectedSourceLanguages([]);
@@ -50,6 +60,7 @@ export const Form: React.FC<CreateUserProps> = ({
     event.preventDefault();
 
     const payload = {
+      creatorId,
       firstName,
       lastName,
       userName,
@@ -74,7 +85,7 @@ export const Form: React.FC<CreateUserProps> = ({
     };
 
     console.log("Form Submitted", payload);
-    createUser(payload);
+    // createUser(payload);
     router.push("/users");
   };
 
