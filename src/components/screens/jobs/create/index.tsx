@@ -28,14 +28,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { UserList } from "../components/userlist";
 import { User } from "@/models/users";
 import { useRouter } from "next/navigation";
+import app from "@/lib/firebaseConfig";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 const MOCK_TARGET_LANGUAGES = [
   {
-    id: "en",
+    id: "EN",
     name: "English",
     user: [
       {
-        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d5c",
+        id: "clxm7toie0000ikgq1wf2nkyj",
         firstName: "Phuc Lam",
         lastName: "Phung",
         username: "lamphung",
@@ -44,7 +46,7 @@ const MOCK_TARGET_LANGUAGES = [
         status: "Active",
       },
       {
-        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d6c",
+        id: "clxm7toie0001ikgq1wf2nkyj",
         firstName: "Dai Nguyen",
         lastName: "Le",
         username: "nguyenle",
@@ -53,7 +55,7 @@ const MOCK_TARGET_LANGUAGES = [
         status: "Active",
       },
       {
-        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d7c",
+        id: "clxm7toie0004ikgq1wf2nkyj",
         firstName: "Dang Truong",
         lastName: "Phan",
         username: "hommet",
@@ -64,11 +66,11 @@ const MOCK_TARGET_LANGUAGES = [
     ],
   },
   {
-    id: "fr",
+    id: "FR",
     name: "French",
     user: [
       {
-        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d7c",
+        id: "clxm7toie0002ikgq1wf2nkyj",
         firstName: "Thien Phuoc",
         lastName: "Duong",
         username: "thienphuoc",
@@ -77,7 +79,7 @@ const MOCK_TARGET_LANGUAGES = [
         status: "Active",
       },
       {
-        id: "9e722f34-798d-43a8-ac78-e8fbc8fc4d8c",
+        id: "clxm7toie0003ikgq1wf2nkyj",
         firstname: "Quang Huy",
         lastName: "Tran",
         username: "tranhuy",
@@ -95,8 +97,10 @@ const FormSchema = z.object({
       if (!(file instanceof File)) {
         return false;
       }
-      const validTypes = ["image/jpeg", "image/png", "application/pdf"];
-      const maxSize = 5 * 1024 * 1024; // 5 MB
+      const validTypes = [
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
+      const maxSize = 5 * 1024 * 1024;
 
       if (!validTypes.includes(file.type)) {
         return false;
@@ -109,8 +113,7 @@ const FormSchema = z.object({
       return true;
     },
     {
-      message:
-        "Invalid file. Only JPEG, PNG, and PDF files under 5MB are allowed.",
+      message: "Invalid file. Only DOCX files under 5MB are allowed.",
     }
   ),
   target_languages: z.array(z.any()),
@@ -152,6 +155,22 @@ export function CreateJobScreen() {
 
   const onSubmit = async (data) => {
     const jobsPayload = [];
+    const storage = getStorage(app);
+
+    const storageRef = ref(storage, data.file.name.split(".")[0]);
+
+    // 'file' comes from the Blob or File API
+    const file = data.file; // replace with your file input's name attribute
+
+    // Upload the file to the path 'some-child'
+    const snapshot = await uploadBytes(storageRef, file);
+
+    console.log("Uploaded a blob or file!", snapshot);
+
+    // Get the download URL of the uploaded file
+    const downloadURL = await getDownloadURL(storageRef);
+
+    console.log(JSON.stringify(jobsPayload));
 
     Object.keys(checkedLanguages).forEach((languageId) => {
       if (checkedLanguages[languageId]) {
@@ -163,12 +182,12 @@ export function CreateJobScreen() {
           dueDate: format(data.duedate, "yyyy-MM-dd"),
           fileExtention: `.${data.file.name.split(".").pop()}`,
           status: "new",
+          documentUrl: downloadURL,
         };
 
         jobsPayload.push(jobPayload);
       }
     });
-    console.log(JSON.stringify(jobsPayload));
     const response = await fetch("http://localhost:9999/jobs/create", {
       method: "POST",
       headers: {
