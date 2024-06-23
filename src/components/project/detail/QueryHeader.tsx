@@ -2,6 +2,7 @@ import * as React from "react";
 import { Trash2, Pencil, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter } from 'next/navigation';
 
 interface QueryProp {
   name: string;
@@ -16,6 +17,7 @@ const QueryHeader: React.FC<QueryProp> = ({
   table,
   rowSelection,
 }) => {
+  const router = useRouter();
   return (
     <div className="flex justify-between gap-5 py-4">
       <div className="flex gap-5">
@@ -56,7 +58,7 @@ const QueryHeader: React.FC<QueryProp> = ({
           Delete
         </Button>
       </div>
-      <Button className="bg-[#FF9300] mr-5" variant="outline" size="icon">
+      <Button className="bg-[#FF9300] mr-5" variant="outline" size="icon" onClick={() => router.push("/jobs/create")}>
         <Plus className="h-4 w-4" color="white" />
       </Button>
     </div>
