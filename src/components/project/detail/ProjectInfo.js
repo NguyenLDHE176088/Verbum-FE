@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import classes from './ProjectInfo.module.css';
 import { Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { getProjectFromAPI } from '@/data/projects'; 
+import { getProjectFromAPI } from '@/data/projects';
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 
@@ -16,7 +16,7 @@ import { format } from 'date-fns';
 
 export default function ProjectInfo({ id }) {
 
-    const [data, setData]= useState({});
+    const [data, setData] = useState({});
 
     const getProjectInfoById = async (projectId) => {
         try {
@@ -34,6 +34,7 @@ export default function ProjectInfo({ id }) {
 
     useEffect(() => {
         getProjectInfoById(id);
+        console.log(data);
     }, [id]);
     return (
         <>
@@ -68,7 +69,7 @@ export default function ProjectInfo({ id }) {
                             </div>
                             <div className={classes.displayObject}>
                                 <div>Created:</div>
-                                <div>{data.createdAt ? format(new Date(data.createdAt ), 'dd/MM/yyyy') : 'Invalid Date'}</div>
+                                <div>{data.createdAt ? format(new Date(data.createdAt), 'dd/MM/yyyy') : 'Invalid Date'}</div>
                             </div>
                             <div className={classes.displayObject}>
                                 <div>Status: </div>
@@ -81,16 +82,18 @@ export default function ProjectInfo({ id }) {
                             <div className={classes.displayObject}>
                                 <div>Source language: </div>
                                 <div className="flex">{
-                                    data.sourceLanguage
-                                     || <p>none</p>
+                                    <span>
+                                        <Badge variant="secondary">{data.sourceLanguage}</Badge>
+                                    </span>
+                                    || <p>none</p>
                                 }</div>
                             </div>
                             <div className={classes.displayObject}>
                                 <div>Target language: </div>
                                 <div className="flex">{
-                                    data.targetLanguage?.map(language => (
-                                        <span key={language.valueOf}>
-                                            <Badge variant="secondary">{language}</Badge>
+                                    data.TargetLanguage?.map(language => (
+                                        <span key={language.projectId}>
+                                            <Badge variant="secondary">{language.languageCode}</Badge>
                                         </span>
                                     )) || <p>none</p>
                                 }</div>

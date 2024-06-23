@@ -10,7 +10,6 @@ import { getUser } from '@/lib/cookies'
 import { useRouter } from 'next/navigation';
 
 
-
 const details = {
     name: '',
     sourceLanguage: '',
@@ -113,7 +112,7 @@ export default function CreateProject() {
             createBy: id,
             description: "This is a new project",
             status: "Active",
-            onwer: id,
+            owner: id,
             sourceLanguage,
             dueDate: new Date(dueDate).toISOString(),
             clientName: "Client A",
