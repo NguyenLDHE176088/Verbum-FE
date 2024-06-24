@@ -41,18 +41,18 @@ export async function createUser(body: any) {
     const data = await response.json();
 
     if (!response.ok) {
-      alert(`Error: ${data.message || "An error occurred"}`);
-
+      alert(`Error at create user: ${data.message || "An error occurred"}`);
       return { error: data };
     }
 
     alert("User created successfully!");
     return { success: data };
   } catch (error) {
-    alert(`Error: ${error.message || "An error occurred"}`);
-    window.location.reload();
+    alert(`Error at create user: ${error.message || "An error occurred"}`);
+    return { error: { message: error.message } };
   }
 }
+
 export async function deleteUser(id: string[]) {
   try {
     const response = await fetch(`http://localhost:9999/users/${id}`, {
