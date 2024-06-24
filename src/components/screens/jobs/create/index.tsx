@@ -210,9 +210,8 @@ export function CreateJobScreen({projectId}) {
         const jobPayload = {
           userIds: selectedUsers[languageId]?.map((user) => user.id) || [],
           name: data.file.name.split(".")[0],
-          projectId,
+          projectId: parseInt(projectId),
           targetLanguageId: languageId,
-          projectId: 1, // replace with actual project id
           dueDate: format(data.duedate, "yyyy-MM-dd"),
           fileExtention: `.${data.file.name.split(".").pop()}`,
           status: "new",
