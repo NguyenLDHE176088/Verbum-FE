@@ -36,7 +36,7 @@ const JobColumns: ColumnDef<Job>[] = [
     header: () => <p className="font-bold">#</p>,
   },
   {
-    accessorKey: "created_date",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -75,7 +75,7 @@ const JobColumns: ColumnDef<Job>[] = [
     header: " ",
   },
   {
-    accessorKey: "target_language",
+    accessorKey: "targetLanguageId",
     header: ({ column }) => {
       return (
         <Button
@@ -90,32 +90,32 @@ const JobColumns: ColumnDef<Job>[] = [
     },
     cell: ({ row }) => (
       <Badge variant="outline" className="text-left">
-        {row.getValue("target_language")}
+        {row.getValue("targetLanguageId")}
       </Badge>
     ),
   },
   {
-    accessorKey: FILE_NAME,
+    accessorKey: "name",
     header: () => <p className="pl-0">File Name</p>,
     cell: ({ row }) => (
-      <div className="text-left">{row.getValue("filename")}</div>
+      <div className="text-left">{row.getValue("name")}</div>
     ),
   },
-  {
-    accessorKey: "words",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Words
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
+  // {
+  //   accessorKey: "words",
+  //   header: ({ column }) => {
+  //     return (
+  //       <Button
+  //         variant="ghost"
+  //         className="pl-0"
+  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //       >
+  //         Words
+  //         <ArrowUpDown className="ml-2 h-4 w-4" />
+  //       </Button>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "provider",
     header: ({ column }) => {
@@ -147,7 +147,7 @@ const JobColumns: ColumnDef<Job>[] = [
     },
   },
   {
-    accessorKey: "due_date",
+    accessorKey: "dueDate",
     header: ({ column }) => {
       return (
         <Button
