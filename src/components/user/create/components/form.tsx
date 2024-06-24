@@ -86,8 +86,9 @@ export const Form: React.FC<CreateUserProps> = ({
     };
 
     console.log("Form Submitted", payload);
-    createUser(payload);
-    window.location.href = "/users";
+    Promise.resolve(createUser(payload)).then(() => {
+      window.location.href = "/users";
+    });
   };
 
   return (
