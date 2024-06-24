@@ -33,8 +33,7 @@ export default function ProjectInfo({ id }) {
     };
 
     useEffect(() => {
-        getProjectInfoById(id);
-        console.log(data);
+        Promise.resolve(getProjectInfoById(id));
     }, [id]);
     return (
         <>

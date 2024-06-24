@@ -40,14 +40,18 @@ export default function ProjectDetail() {
         setError("Failed to fetch reference data");
       }
     };
-    fetchJobData();
-    fetchReferenceData();
+
+    Promise.resolve(fetchJobData())
+      .then(() => fetchReferenceData())
+      .catch((e) => {
+        alert(e.message);
+      });
   }, [id]);
 
   return (
     <MainLayout>
       <ProjectInfo id={id} />
-      <JobTable data={job} />
+      <JobTable data={job} projectId = {id} />
       <ReferenceTable data={reference} />
     </MainLayout>
   );

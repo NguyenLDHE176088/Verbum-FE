@@ -25,7 +25,7 @@ const FILE_NAME = "filename";
 
 const columns = JobColumns;
 
-export function JobTable({ data }) {
+export function JobTable({ data, projectId }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -55,6 +55,7 @@ export function JobTable({ data }) {
         inputQueryType={FILE_NAME}
         table={table}
         rowSelection={rowSelection}
+        projectId = {projectId}
       />
       <Table className="table-auto ">
         <TableHeader>
