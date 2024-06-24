@@ -5,7 +5,6 @@ import { MainLayout } from "@/components/layouts/MainLayout";
 export default function AllProject() {
     return (
         <MainLayout>
-
             <TranslationTable />
         </MainLayout>
     )

@@ -10,7 +10,6 @@ import { getUser } from '@/lib/cookies'
 import { useRouter } from 'next/navigation';
 
 
-
 const details = {
     name: '',
     sourceLanguage: '',
@@ -113,7 +112,7 @@ export default function CreateProject() {
             createBy: id,
             description: "This is a new project",
             status: "Active",
-            onwer: id,
+            owner: id,
             sourceLanguage,
             dueDate: new Date(dueDate).toISOString(),
             clientName: "Client A",
@@ -125,8 +124,8 @@ export default function CreateProject() {
             emptyTargetIgnore: emptyTarget.ignore,
             extraNumberInTargetQA: extraNumber.check,
             extraNumberInTargetIgnore: extraNumber.ignore,
-            inconsistenInTargetQA: inconsistentTarget.check,
-            inconsistenInTargetIgnore: inconsistentTarget.ignore,
+            inconsistentInTargetQA: inconsistentTarget.check,
+            inconsistentInTargetIgnore: inconsistentTarget.ignore,
             leadingAndTrailingSpaceQA: leadingSpace.check,
             leadingAndTrailingSpaceIgnore: leadingSpace.ignore,
             maxTargetLengthPercentage: maxSegmentLengthPercent.value,
