@@ -9,6 +9,7 @@ interface QueryProp {
   inputQueryType: string;
   table: any;
   rowSelection: any;
+  projectId: any
 }
 
 const QueryHeader: React.FC<QueryProp> = ({
@@ -16,6 +17,7 @@ const QueryHeader: React.FC<QueryProp> = ({
   inputQueryType,
   table,
   rowSelection,
+  projectId
 }) => {
   const router = useRouter();
   return (
@@ -58,7 +60,7 @@ const QueryHeader: React.FC<QueryProp> = ({
           Delete
         </Button>
       </div>
-      <Button className="bg-[#FF9300] mr-5" variant="outline" size="icon" onClick={() => router.push("/jobs/create")}>
+      <Button className="bg-[#FF9300] mr-5" variant="outline" size="icon" onClick={() => router.push(`/jobs/create/${projectId}`)}>
         <Plus className="h-4 w-4" color="white" />
       </Button>
     </div>

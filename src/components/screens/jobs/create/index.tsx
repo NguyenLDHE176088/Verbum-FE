@@ -60,9 +60,8 @@ const FormSchema = z.object({
   duedate: z.date(),
 });
 
-const projectId = "1";
 
-export function CreateJobScreen() {
+export function CreateJobScreen({projectId}) {
   const [userId, setUserId] = useState<string>();
   const [userCompany, setUserCompany] = useState<string>();
   const [projectSourceLanguage, setProjectSourceLanguage] =
@@ -211,6 +210,7 @@ export function CreateJobScreen() {
         const jobPayload = {
           userIds: selectedUsers[languageId]?.map((user) => user.id) || [],
           name: data.file.name.split(".")[0],
+          projectId,
           targetLanguageId: languageId,
           projectId: 1, // replace with actual project id
           dueDate: format(data.duedate, "yyyy-MM-dd"),
