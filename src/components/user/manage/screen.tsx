@@ -78,7 +78,7 @@ export default function Index() {
     deleteUser(
       table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
     );
-    window.location.reload
+    window.location.reload();
   };
 
   return (

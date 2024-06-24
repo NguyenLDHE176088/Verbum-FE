@@ -41,7 +41,7 @@ export const Form: React.FC<CreateUserProps> = ({
   const [selectedTargetLanguages, setSelectedTargetLanguages] = useState<
     string[]
   >([]);
-  
+
   async function getCreatorId() {
     const result = await getUserIdFromCookie();
     setCreatorId(result);
@@ -58,7 +58,7 @@ export const Form: React.FC<CreateUserProps> = ({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
+    const joinDate = new Date();
     const payload = {
       creatorId,
       firstName,
@@ -72,6 +72,7 @@ export const Form: React.FC<CreateUserProps> = ({
       allowManageTermBase,
       allowViewAllProject,
       status,
+      joinDate,
       LanguageUser: [
         ...selectedSourceLanguages.map((languageCode) => ({
           languageCode,
@@ -85,8 +86,8 @@ export const Form: React.FC<CreateUserProps> = ({
     };
 
     console.log("Form Submitted", payload);
-    // createUser(payload);
-    router.push("/users");
+    createUser(payload);
+    window.location.href = "/users";
   };
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { getUserIdFromCookie } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export async function getUsers() {
   try {
@@ -41,6 +42,7 @@ export async function createUser(body: any) {
 
     if (!response.ok) {
       alert(`Error: ${data.message || "An error occurred"}`);
+
       return { error: data };
     }
 
@@ -48,7 +50,7 @@ export async function createUser(body: any) {
     return { success: data };
   } catch (error) {
     alert(`Error: ${error.message || "An error occurred"}`);
-    return { error: { message: error.message } };
+    window.location.reload();
   }
 }
 export async function deleteUser(id: string[]) {
