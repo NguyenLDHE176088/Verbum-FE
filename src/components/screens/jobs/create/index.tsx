@@ -12,7 +12,6 @@ import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,70 +25,11 @@ import {
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UserList } from "../components/userlist";
-import { User } from "@/models/users";
 import { useRouter } from "next/navigation";
 import app from "@/lib/firebaseConfig";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-
-const MOCK_TARGET_LANGUAGES = [
-  {
-    id: "EN",
-    name: "English",
-    user: [
-      {
-        id: "clxm7toie0000ikgq1wf2nkyj",
-        firstName: "Phuc Lam",
-        lastName: "Phung",
-        username: "lamphung",
-        email: "lamphung@email.com",
-        role: "Linguist",
-        status: "Active",
-      },
-      {
-        id: "clxm7toie0001ikgq1wf2nkyj",
-        firstName: "Dai Nguyen",
-        lastName: "Le",
-        username: "nguyenle",
-        email: "nguyenle@email.com",
-        role: "Linguist",
-        status: "Active",
-      },
-      {
-        id: "clxm7toie0004ikgq1wf2nkyj",
-        firstName: "Dang Truong",
-        lastName: "Phan",
-        username: "hommet",
-        email: "hommet@email.com",
-        role: "Linguist",
-        status: "Active",
-      },
-    ],
-  },
-  {
-    id: "FR",
-    name: "French",
-    user: [
-      {
-        id: "clxm7toie0002ikgq1wf2nkyj",
-        firstName: "Thien Phuoc",
-        lastName: "Duong",
-        username: "thienphuoc",
-        email: "thienphuoc@email.com",
-        role: "Linguist",
-        status: "Active",
-      },
-      {
-        id: "clxm7toie0003ikgq1wf2nkyj",
-        firstname: "Quang Huy",
-        lastName: "Tran",
-        username: "tranhuy",
-        email: "tranhuy@email.com",
-        role: "Linguist",
-        status: "Active",
-      },
-    ],
-  },
-];
+import { getUserIdFromCookie } from "@/lib/auth";
+import { Language } from "@/models/languages";
 
 const FormSchema = z.object({
   file: z.custom(
@@ -120,16 +60,77 @@ const FormSchema = z.object({
   duedate: z.date(),
 });
 
+const projectId = "1";
+
 export function CreateJobScreen() {
-  const [targetLanguages, setTargetLanguages] = useState([]);
+  const [userId, setUserId] = useState<string>();
+  const [userCompany, setUserCompany] = useState<string>();
+  const [projectSourceLanguage, setProjectSourceLanguage] =
+    useState<Language>();
+  const [projectTargetLanguages, setProjectTargetLanguages] = useState([]);
+  const [selectedTargetLanguages, setSelectedTargetLanguages] = useState([]);
   const [checkedLanguages, setCheckedLanguages] = useState({});
   const [selectedUsers, setSelectedUsers] = useState({});
   const router = useRouter();
 
+  const getUserId = async () => {
+    const response = await getUserIdFromCookie();
+    setUserId(response);
+    return response;
+  };
+
+  const fetchUserCompany = async (userId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:9999/company/find-by-user-id?userId=${userId}`
+      );
+      const data = await response.json();
+      setUserCompany(data.companyId);
+    } catch (error) {
+      console.error("Error fetching user company:", error);
+    }
+  };
+
+  const fetchProjectSourceLanguage = async (projectId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:9999/languages/source-language?projectId=${projectId}`
+      );
+      const data = await response.json();
+      setProjectSourceLanguage(data.language);
+    } catch (error) {
+      console.error("Error fetching project source language:", error);
+    }
+  };
+
+  const fetchProjectTargetLanguages = async (projectId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:9999/languages/target-language?projectId=${projectId}`
+      );
+      const data = await response.json();
+      setProjectTargetLanguages(data);
+    } catch (error) {
+      console.error("Error fetching project target languages:", error);
+    }
+  };
+
   useEffect(() => {
-    // Simulate fetching target languages from API
-    setTargetLanguages(MOCK_TARGET_LANGUAGES);
-  }, []);
+    const initialize = async () => {
+      const userId = await getUserId();
+      if (userId) {
+        await fetchUserCompany(userId);
+      }
+      if (projectId) {
+        await Promise.all([
+          fetchProjectSourceLanguage(projectId as string),
+          fetchProjectTargetLanguages(projectId as string),
+        ]);
+      }
+    };
+
+    initialize();
+  }, [projectId]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -139,17 +140,46 @@ export function CreateJobScreen() {
     },
   });
 
-  const handleCheckboxChange = (id) => {
+  const handleCheckboxChange = async (id) => {
+    console.log("id", id);
+    console.log("sourceLanguage", projectSourceLanguage);
+    // Toggle the checkbox state
     setCheckedLanguages((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
+
+    if (!checkedLanguages[id]) {
+      try {
+        const response = await fetch(
+          `http://localhost:9999/jobs/find-by-source-target-language?companyId=${userCompany}&sourceLanguageCode=${projectSourceLanguage.code}&targetLanguageCode=${id}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch target languages");
+        }
+
+        const data = await response.json();
+        console.log("data", data);
+
+        // Add the fetched language to selectedTargetLanguages
+        setSelectedTargetLanguages((prev) => [...prev, data]);
+      } catch (error) {
+        console.error("Error fetching target languages:", error);
+      }
+    } else {
+      // Remove the language from selectedTargetLanguages if the checkbox is unchecked
+      setSelectedTargetLanguages((prev) =>
+        prev.filter((lang) => lang.code !== id)
+      );
+    }
   };
 
-  const handleUserSelection = (languageId, users) => {
+  console.log("selectedTargetLanguages", selectedTargetLanguages);
+
+  const handleUserSelection = (code, users) => {
     setSelectedUsers((prev) => ({
       ...prev,
-      [languageId]: users,
+      [code]: users,
     }));
   };
 
@@ -159,11 +189,11 @@ export function CreateJobScreen() {
 
     const storageRef = ref(storage, data.file.name);
 
-    // 'file' comes from the Blob or File API
-    const file = data.file; // replace with your file input's name attribute
+    const file = data.file;
 
     const metadata = {
-      contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      contentType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     };
 
     // Upload the file to the path 'some-child'
@@ -208,6 +238,10 @@ export function CreateJobScreen() {
     router.push("/jobs");
   };
 
+  if (!userCompany || !projectSourceLanguage || !projectTargetLanguages) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
@@ -230,7 +264,7 @@ export function CreateJobScreen() {
             </FormItem>
           )}
         />
-        {targetLanguages.map((language, index) => (
+        {projectTargetLanguages.map((language, index) => (
           <FormField
             key={index}
             control={form.control}
@@ -239,8 +273,8 @@ export function CreateJobScreen() {
               <FormItem>
                 <Checkbox
                   className="mr-3"
-                  checked={!!checkedLanguages[language.id]}
-                  onCheckedChange={() => handleCheckboxChange(language.id)}
+                  checked={!!checkedLanguages[language.code]}
+                  onCheckedChange={() => handleCheckboxChange(language.code)}
                 />
                 <FormLabel>{language.name}</FormLabel>
                 <FormControl>
@@ -249,10 +283,10 @@ export function CreateJobScreen() {
                       <Button
                         variant="outline"
                         className="justify-start ml-3"
-                        disabled={!checkedLanguages[language.id]}
+                        disabled={!checkedLanguages[language.code]}
                       >
-                        {selectedUsers[language.id]?.length > 0
-                          ? `${selectedUsers[language.id]
+                        {selectedUsers[language.code]?.length > 0
+                          ? `${selectedUsers[language.code]
                               .map(
                                 (user) => user.lastName + " " + user.firstName
                               )
@@ -262,10 +296,14 @@ export function CreateJobScreen() {
                     </PopoverTrigger>
                     <PopoverContent className="w-[200px] p-0" align="start">
                       <UserList
-                        users={language.user}
-                        selectedUsers={selectedUsers[language.id] || []}
+                        users={
+                          selectedTargetLanguages.find(
+                            (lang) => lang.code === language.code
+                          )?.users || []
+                        }
+                        selectedUsers={selectedUsers[language.code] || []}
                         onUserSelection={(users) =>
-                          handleUserSelection(language.id, users)
+                          handleUserSelection(language.code, users)
                         }
                       />
                     </PopoverContent>

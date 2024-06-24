@@ -11,17 +11,22 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { User } from "@/models/users";
+
+type UserNameInfo = {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
 
 type UserListProps = {
-  users: User[];
-  selectedUsers: User[];
-  onUserSelection: (selectedUsers: User[]) => void;
+  users: UserNameInfo[];
+  selectedUsers: UserNameInfo[];
+  onUserSelection: (selectedUsers: UserNameInfo[]) => void;
 };
 
 export function UserList({ users, selectedUsers, onUserSelection }: UserListProps) {
   const [internalSelectedUsers, setInternalSelectedUsers] =
-    useState<User[]>(selectedUsers);
+    useState<UserNameInfo[]>(selectedUsers);
 
   useEffect(() => {
     onUserSelection(internalSelectedUsers);
@@ -31,13 +36,15 @@ export function UserList({ users, selectedUsers, onUserSelection }: UserListProp
     setInternalSelectedUsers(selectedUsers);
   }, [selectedUsers]);
 
-  const handleCheckboxChange = (user: User) => {
+  const handleCheckboxChange = (user: UserNameInfo) => {
     setInternalSelectedUsers((prev) =>
       prev.includes(user)
         ? prev.filter((u) => u.id !== user.id)
         : [...prev, user]
     );
   };
+
+  console.log(users);
 
   return (
     <Command>
