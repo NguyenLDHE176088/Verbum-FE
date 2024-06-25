@@ -213,7 +213,7 @@ export function CreateJobScreen({projectId}) {
           projectId: parseInt(projectId),
           targetLanguageId: languageId,
           dueDate: format(data.duedate, "yyyy-MM-dd"),
-          fileExtention: `.${data.file.name.split(".").pop()}`,
+          fileExtension: `.${data.file.name.split(".").pop()}`,
           status: "new",
           documentUrl: downloadURL,
         };
