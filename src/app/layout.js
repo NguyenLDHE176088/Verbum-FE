@@ -1,5 +1,8 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { LanguageContextProvider } from "@/context/languageContext";
+import { MainLayout } from "@/components/layouts/MainLayout";
+import { UserContextProvider } from "@/context/userContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -9,6 +12,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+<<<<<<< HEAD
     return (
         <html lang="en" className={module.css}>
             <body suppressHydrationWarning={true} className={inter.className}>
@@ -16,4 +20,19 @@ export default function RootLayout({ children }) {
             </body>
         </html>
     );
+=======
+  return (
+    <html lang="en" className={inter.className}>
+      <body suppressHydrationWarning={true}>
+        <UserContextProvider>
+          <LanguageContextProvider>
+            <MainLayout>
+              {children}
+            </MainLayout>
+          </LanguageContextProvider>
+        </UserContextProvider>
+      </body>
+    </html>
+  );
+>>>>>>> develop
 }

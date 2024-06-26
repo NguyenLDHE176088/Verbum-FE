@@ -140,8 +140,6 @@ export function CreateJobScreen({projectId}) {
   });
 
   const handleCheckboxChange = async (id) => {
-    console.log("id", id);
-    console.log("sourceLanguage", projectSourceLanguage);
     // Toggle the checkbox state
     setCheckedLanguages((prev) => ({
       ...prev,
@@ -158,7 +156,6 @@ export function CreateJobScreen({projectId}) {
         }
 
         const data = await response.json();
-        console.log("data", data);
 
         // Add the fetched language to selectedTargetLanguages
         setSelectedTargetLanguages((prev) => [...prev, data]);
@@ -173,7 +170,6 @@ export function CreateJobScreen({projectId}) {
     }
   };
 
-  console.log("selectedTargetLanguages", selectedTargetLanguages);
 
   const handleUserSelection = (code, users) => {
     setSelectedUsers((prev) => ({
@@ -198,12 +194,10 @@ export function CreateJobScreen({projectId}) {
     // Upload the file to the path 'some-child'
     const snapshot = await uploadBytes(storageRef, file, metadata);
 
-    console.log("Uploaded a blob or file!", snapshot);
 
     // Get the download URL of the uploaded file
     const downloadURL = await getDownloadURL(storageRef);
 
-    console.log(JSON.stringify(jobsPayload));
 
     Object.keys(checkedLanguages).forEach((languageId) => {
       if (checkedLanguages[languageId]) {
@@ -213,7 +207,7 @@ export function CreateJobScreen({projectId}) {
           projectId: parseInt(projectId),
           targetLanguageId: languageId,
           dueDate: format(data.duedate, "yyyy-MM-dd"),
-          fileExtention: `.${data.file.name.split(".").pop()}`,
+          fileExtension: `.${data.file.name.split(".").pop()}`,
           status: "new",
           documentUrl: downloadURL,
         };

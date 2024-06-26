@@ -1,32 +1,16 @@
 
 'use client'
-import React, { useState, useRef,useEffect} from 'react';
+import { LanguageContext } from "@/context/languageContext";
+import React, { useState, useRef, useContext} from 'react';
 
 
 const TargetLanguageSelector = ({onLanguagesChange}) => {
-    const [languages, setLanguages] = useState([])
+    const languages = useContext(LanguageContext);
     const [selectedLanguages, setSelectedLanguages] = useState([]);
     const [selectedLanguagesShortCut, setSelectedLanguagesShortCut] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
-
-    useEffect(()=>{
-        const fetchLanguages = async () => {
-            try {
-                const response = await fetch('http://localhost:9999/languages/all');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setLanguages(data.languages); 
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        };
-
-        fetchLanguages();
-    },[]);
 
     const handleCheckboxChange = (code) => {
 

@@ -1,25 +1,19 @@
 "use client";
+import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
-import { Language } from "@/models/languages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createUser } from "@/data/users";
 import { Label } from "@/components/ui/label";
 import { Combobox } from "@/components/user/create/components/combobox";
 import { Permissions } from "./Permissions";
-import LanguageSelector from "./languageSelector";
 import { useRouter } from "next/navigation";
 import { getUserIdFromCookie } from "@/lib/auth";
+const DynamicLanguageSelector = dynamic(() => import("./languageSelector"));
 
-interface CreateUserProps {
-  languages: Language[];
-  setLanguages: React.Dispatch<React.SetStateAction<Language[]>>;
-}
+interface CreateUserProps {}
 
-export const Form: React.FC<CreateUserProps> = ({
-  languages,
-  setLanguages,
-}) => {
+export const Form: React.FC<CreateUserProps> = () => {
   const router = useRouter();
   const [creatorId, setCreatorId] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
@@ -85,7 +79,6 @@ export const Form: React.FC<CreateUserProps> = ({
       ],
     };
 
-    console.log("Form Submitted", payload);
     Promise.resolve(createUser(payload)).then(() => {
       window.location.href = "/users";
     });
@@ -152,8 +145,7 @@ export const Form: React.FC<CreateUserProps> = ({
           <div className="flex flex-col space-y-2 pt-2">
             <Label>
               <span className="text-md font-semibold">Source Language</span>
-              <LanguageSelector
-                languages={languages}
+              <DynamicLanguageSelector
                 selectedLanguages={selectedSourceLanguages}
                 setSelectedLanguages={setSelectedSourceLanguages}
                 type="source"
@@ -161,8 +153,7 @@ export const Form: React.FC<CreateUserProps> = ({
             </Label>
             <Label>
               <span className="text-md font-semibold">Target Language</span>
-              <LanguageSelector
-                languages={languages}
+              <DynamicLanguageSelector
                 selectedLanguages={selectedTargetLanguages}
                 setSelectedLanguages={setSelectedTargetLanguages}
                 type="target"

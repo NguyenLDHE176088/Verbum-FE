@@ -1,8 +1,8 @@
 'use client'
 
-import { MainLayout } from "@/components/layouts/MainLayout";
 import UserInfor from "@/components/auth/user-infor";
 import { useEffect, useState } from "react";
+
 
 export default function Home() {
     const [isCompany, setIsCompany] = useState(null);
@@ -13,8 +13,8 @@ export default function Home() {
     }, []);
 
     return (
-        <MainLayout>
+        <>
             {isCompany !== 'true' && <UserInfor />}
-        </MainLayout>
+        </>
     );
 }

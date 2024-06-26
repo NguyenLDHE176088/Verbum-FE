@@ -10,33 +10,21 @@ import { getReferencesByProjectId } from "@/data/projects";
 import { Reference } from "@/models/Reference";
 
 export default function ProjectDetail() {
-  const router = useRouter();
   const { id } = useParams<{ id: string }>();
-  const [error, setError] = React.useState<string | null>(null);
   const [job, setJob] = React.useState<Job[]>([]);
   const [reference, setReference] = React.useState<Reference[]>([]);
 
   React.useEffect(() => {
     const fetchJobData = async () => {
-      try {
-        const result = await getJobsByProjectId(+id);
-        if (result.success) {
-          setJob(result.success);
-        }
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch data");
+      const result = await getJobsByProjectId(+id);
+      if (result.success) {
+        setJob(result.success);
       }
     };
     const fetchReferenceData = async () => {
-      try {
-        const result = await getReferencesByProjectId(+id);
-        if (result.success) {
-          setReference(result.success);
-        }
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch reference data");
+      const result = await getReferencesByProjectId(+id);
+      if (result.success) {
+        setReference(result.success);
       }
     };
 
