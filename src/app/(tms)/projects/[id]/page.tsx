@@ -3,7 +3,6 @@ import React from "react";
 import ProjectInfo from "@/components/project/detail/ProjectInfo";
 import { JobTable } from "@/components/project/detail/Job/JobTable";
 import { ReferenceTable } from "@/components/project/detail/Reference/ReferenceTable";
-import { MainLayout } from "@/components/layouts/MainLayout";
 import { useParams, useRouter } from "next/navigation";
 import { getJobsByProjectId } from "@/data/job";
 import { Job } from "@/models/jobs";
@@ -49,10 +48,10 @@ export default function ProjectDetail() {
   }, [id]);
 
   return (
-    <MainLayout>
+    <>
       <ProjectInfo id={id} />
-      <JobTable data={job} projectId = {id} />
+      <JobTable data={job} projectId={id} />
       <ReferenceTable data={reference} />
-    </MainLayout>
+    </>
   );
 }

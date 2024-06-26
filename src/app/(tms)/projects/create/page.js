@@ -4,7 +4,6 @@ import QualityForm from '@/components/project/createProject/QualityForm.js';
 import TitlePage from '@/components/project/TitlePage';
 import StatusForm from '@/components/project/createProject/StatusForm';
 import { useState } from 'react';
-import { MainLayout } from "@/components/layouts/MainLayout";
 import { createProjectFromAPI } from '@/data/projects';
 import { getUser } from '@/lib/cookies'
 import { useRouter } from 'next/navigation';
@@ -231,50 +230,47 @@ export default function CreateProject() {
     };
 
     return (
-
-        <MainLayout>
-            <>
-                <div className="w-full flex flex-col items-center">
-                    <div className="flex flex-row overflow-hidden w-[95%]" >
-                        <div className="p-4 rounded-lg border-black border-solid border w-[40%]" >
-                            <p
-                                onClick={() => handleOnClickFormState('Details')}
-                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Details" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
-                            >
-                                Project Details
-                            </p>
-                            <p
-                                onClick={() => handleOnClickFormState('Status')}
-                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Status" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
-                            >
-                                Project Status Automation
-                            </p>
-                            <p
-                                onClick={() => handleOnClickFormState('Quality')}
-                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Quality" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
-                            >
-                                Quality Assurance
-                            </p>
-                        </div>
-                        <div className="ml-[5%] rounded-[10px] border border-black flex-1 p-[20px]">
-                            <form onSubmit={handleSubmit}>
-                                {formState === "Details" && (
-                                    <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
-                                )}
-                                {formState === "Status" && (
-                                    <StatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
-                                )}
-                                {formState === "Quality" && (
-                                    <QualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
-                                )}
-                                <button type="submit" className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Create project</button>
-                                {success && <p className="text-red-500 mt-2">{success}</p>}
-                            </form>
-                        </div>
+        <>
+            <div className="w-full flex flex-col items-center">
+                <div className="flex flex-row overflow-hidden w-[95%]" >
+                    <div className="p-4 rounded-lg border-black border-solid border w-[40%]" >
+                        <p
+                            onClick={() => handleOnClickFormState('Details')}
+                            className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Details" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                        >
+                            Project Details
+                        </p>
+                        <p
+                            onClick={() => handleOnClickFormState('Status')}
+                            className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Status" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                        >
+                            Project Status Automation
+                        </p>
+                        <p
+                            onClick={() => handleOnClickFormState('Quality')}
+                            className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Quality" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                        >
+                            Quality Assurance
+                        </p>
+                    </div>
+                    <div className="ml-[5%] rounded-[10px] border border-black flex-1 p-[20px]">
+                        <form onSubmit={handleSubmit}>
+                            {formState === "Details" && (
+                                <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
+                            )}
+                            {formState === "Status" && (
+                                <StatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
+                            )}
+                            {formState === "Quality" && (
+                                <QualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
+                            )}
+                            <button type="submit" className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Create project</button>
+                            {success && <p className="text-red-500 mt-2">{success}</p>}
+                        </form>
                     </div>
                 </div>
-            </>
-        </MainLayout>
+            </div>
+        </>
     );
 }
 

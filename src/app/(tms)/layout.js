@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "/src/app/globals.css";
+import { MainLayout } from "@/components/layouts/MainLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,7 +13,9 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en" className={module.css}>
             <body suppressHydrationWarning={true} className={inter.className}>
-                {children}
+                <MainLayout>
+                    {children}
+                </MainLayout>
             </body>
         </html>
     );

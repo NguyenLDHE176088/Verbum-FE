@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MainLayout } from "@/components/layouts/MainLayout";
 import { Language } from "@/models/languages";
 import { Form } from "@/components/user/create/components/form";
 
@@ -26,11 +25,7 @@ const CreateUser: React.FC = () => {
     fetchLanguages();
   }, []);
 
-  return (
-    <MainLayout>
-      <Form languages={languages} setLanguages={setLanguages} />
-    </MainLayout>
-  );
+  return <Form languages={languages} setLanguages={setLanguages} />;
 };
 
 export default CreateUser;

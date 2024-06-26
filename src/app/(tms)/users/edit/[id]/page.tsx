@@ -2,8 +2,6 @@
 import { User } from "@/models/users";
 import { getUser, updateUser } from "@/data/users";
 import { Input } from "@/components/ui/input";
-import { MainLayout } from "@/components/layouts/MainLayout";
-
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useParams } from "next/navigation";
@@ -58,7 +56,7 @@ export default function EditUser() {
   };
 
   return (
-    <MainLayout>
+    <>
       {id && user && id === user.id && (
         <div className="flex flex-col overflow-hidden">
           <div className="w-full max-w-md border rounded-md">
@@ -115,6 +113,6 @@ export default function EditUser() {
           </div>
         </div>
       )}
-    </MainLayout>
+    </>
   );
 }

@@ -3,11 +3,7 @@ import { JobsScreen } from "@/components/screens/jobs";
 import { MainLayout } from "@/components/layouts/MainLayout";
 
 const JobPage = () => {
-  return (
-    <MainLayout>
-      <JobsScreen />
-    </MainLayout>
-  );
+  return <JobsScreen />;
 };
 
 export default JobPage;
