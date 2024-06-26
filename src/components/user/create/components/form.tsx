@@ -12,10 +12,9 @@ import { useRouter } from "next/navigation";
 import { getUserIdFromCookie } from "@/lib/auth";
 
 interface CreateUserProps {
-  setLanguages: React.Dispatch<React.SetStateAction<Language[]>>;
 }
 
-export const Form: React.FC<CreateUserProps> = ({ setLanguages }) => {
+export const Form: React.FC<CreateUserProps> = () => {
   const router = useRouter();
   const [creatorId, setCreatorId] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
