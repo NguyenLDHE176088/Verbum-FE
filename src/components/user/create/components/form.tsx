@@ -1,18 +1,17 @@
 "use client";
+import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
-import { Language } from "@/models/languages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createUser } from "@/data/users";
 import { Label } from "@/components/ui/label";
 import { Combobox } from "@/components/user/create/components/combobox";
 import { Permissions } from "./Permissions";
-import LanguageSelector from "./languageSelector";
 import { useRouter } from "next/navigation";
 import { getUserIdFromCookie } from "@/lib/auth";
+const DynamicLanguageSelector = dynamic(() => import("./languageSelector"));
 
-interface CreateUserProps {
-}
+interface CreateUserProps {}
 
 export const Form: React.FC<CreateUserProps> = () => {
   const router = useRouter();
@@ -147,7 +146,7 @@ export const Form: React.FC<CreateUserProps> = () => {
           <div className="flex flex-col space-y-2 pt-2">
             <Label>
               <span className="text-md font-semibold">Source Language</span>
-              <LanguageSelector
+              <DynamicLanguageSelector
                 selectedLanguages={selectedSourceLanguages}
                 setSelectedLanguages={setSelectedSourceLanguages}
                 type="source"
@@ -155,7 +154,7 @@ export const Form: React.FC<CreateUserProps> = () => {
             </Label>
             <Label>
               <span className="text-md font-semibold">Target Language</span>
-              <LanguageSelector
+              <DynamicLanguageSelector
                 selectedLanguages={selectedTargetLanguages}
                 setSelectedLanguages={setSelectedTargetLanguages}
                 type="target"

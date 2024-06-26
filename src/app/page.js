@@ -1,11 +1,7 @@
 'use client'
 
-import { MainLayout } from "@/components/layouts/MainLayout";
 import UserInfor from "@/components/auth/user-infor";
-import { createContext, useEffect, useState } from "react";
-import { LanguageContextProvider } from "@/context/languageContext";
-
-export const LanguageContext = createContext();
+import { useEffect, useState } from "react";
 
 
 export default function Home() {
@@ -17,8 +13,8 @@ export default function Home() {
     }, []);
 
     return (
-        <MainLayout>
+        <>
             {isCompany !== 'true' && <UserInfor />}
-        </MainLayout>
+        </>
     );
 }
