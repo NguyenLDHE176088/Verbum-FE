@@ -44,7 +44,6 @@ export function UserList({ users, selectedUsers, onUserSelection }: UserListProp
     );
   };
 
-  console.log(users);
 
   return (
     <Command>

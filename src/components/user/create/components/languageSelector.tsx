@@ -1,27 +1,21 @@
-"use client"
-import React, { useState, useEffect, useRef } from "react";
-
-interface Language {
-  code: string;
-  name: string;
-}
+"use client";
+import { LanguageContext } from "@/context/languageContext";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 interface LanguageSelectorProps {
-  languages: Language[];
   selectedLanguages: string[];
   setSelectedLanguages: React.Dispatch<React.SetStateAction<string[]>>;
   type: "source" | "target";
 }
 
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-  languages,
   selectedLanguages,
   setSelectedLanguages,
   type,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
+  const languages = useContext(LanguageContext);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {

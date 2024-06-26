@@ -95,7 +95,6 @@ export default function TranslationTable() {
     };
 
     const handleCloseFilter = (status) => {
-        console.log(status === "Finished");
         if (status === "Finished") {
             setTranslationsBackUp(translations.filter(row =>
                 row.status.toLowerCase().includes(status.toLowerCase())

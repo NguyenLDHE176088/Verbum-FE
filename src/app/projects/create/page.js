@@ -1,44 +1,13 @@
 "use client"
+import dynamic from 'next/dynamic';
 import DetailsForm from '@/components/project/createProject/DetailsForm';
-import QualityForm from '@/components/project/createProject/QualityForm.js';
-import TitlePage from '@/components/project/TitlePage';
-import StatusForm from '@/components/project/createProject/StatusForm';
 import { useState } from 'react';
-import { MainLayout } from "@/components/layouts/MainLayout";
 import { createProjectFromAPI } from '@/data/projects';
 import { getUser } from '@/lib/cookies'
 import { useRouter } from 'next/navigation';
 
-
-const details = {
-    name: '',
-    sourceLanguage: '',
-    targetLanguages: [],
-    dueDate: '',
-    metadata: ''
-}
-
-const status = {
-    emailed: false,
-    accepted: false,
-    completed: false,
-    delivered: false,
-    canceled: false
-}
-
-const quality = {
-    emptyTarget: { check: false, instantQA: false, ignore: false },
-    extraNumber: { check: false, instantQA: false, ignore: false },
-    inconsistentTarget: { check: false, instantQA: false, ignore: false },
-    leadingSpace: { check: false, instantQA: false, ignore: false },
-    maxSegmentLengthPercent: { check: false, instantQA: false, ignore: false, value: 130 },
-    maxTargetSegmentLengthInCharacters: { check: false, instantQA: false, ignore: false, value: 1300 },
-    missingNumber: { check: false, instantQA: false, ignore: false },
-    missingSpaces: { check: false, instantQA: false, ignore: false },
-    repeatedWords: { check: false, instantQA: false, ignore: false },
-    spelling: { check: false, instantQA: false, ignore: false },
-    identicalText: { check: false, instantQA: false, ignore: false },
-}
+const DynamicQualityForm = dynamic(() => import('@/components/project/createProject/QualityForm.js'));
+const DynamicStatusForm = dynamic(() => import('@/components/project/createProject/StatusForm'));
 
 export default function CreateProject() {
     const details = {
@@ -71,10 +40,6 @@ export default function CreateProject() {
         identicalText: { check: false, instantQA: false, ignore: false },
     }
 
-
-
-
-
     const [formState, setFormState] = useState('Details');
     const [success, setSuccess] = useState('');
     const [detailsForm, setDetailsForm] = useState(details);
@@ -85,7 +50,6 @@ export default function CreateProject() {
     const createProjectData = async () => {
         const user = await getUser();
         const id = user.id;
-        console.log(id);
 
         const { name, sourceLanguage, targetLanguages, dueDate, metadata } = detailsForm;
         const { emailed, accepted, completed, delivered, canceled } = statusForm;
@@ -154,7 +118,6 @@ export default function CreateProject() {
 
     const createProject = async () => {
         const projectData = await createProjectData();
-        console.log(projectData);
         const result = await createProjectFromAPI(projectData);
         if (result.success) {
             setSuccess('Project created successfully!');
@@ -231,50 +194,45 @@ export default function CreateProject() {
     };
 
     return (
-
-        <MainLayout>
-            <>
-                <div className="w-full flex flex-col items-center">
-                    <div className="flex flex-row overflow-hidden w-[95%]" >
-                        <div className="p-4 rounded-lg border-black border-solid border w-[40%]" >
-                            <p
-                                onClick={() => handleOnClickFormState('Details')}
-                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Details" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
-                            >
-                                Project Details
-                            </p>
-                            <p
-                                onClick={() => handleOnClickFormState('Status')}
-                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Status" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
-                            >
-                                Project Status Automation
-                            </p>
-                            <p
-                                onClick={() => handleOnClickFormState('Quality')}
-                                className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Quality" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
-                            >
-                                Quality Assurance
-                            </p>
-                        </div>
-                        <div className="ml-[5%] rounded-[10px] border border-black flex-1 p-[20px]">
-                            <form onSubmit={handleSubmit}>
-                                {formState === "Details" && (
-                                    <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
-                                )}
-                                {formState === "Status" && (
-                                    <StatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
-                                )}
-                                {formState === "Quality" && (
-                                    <QualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
-                                )}
-                                <button type="submit" className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Create project</button>
-                                {success && <p className="text-red-500 mt-2">{success}</p>}
-                            </form>
-                        </div>
-                    </div>
+        <div className="w-full flex flex-col items-center">
+            <div className="flex flex-row overflow-hidden w-[95%]" >
+                <div className="p-4 rounded-lg border-black border-solid border w-[40%]" >
+                    <p
+                        onClick={() => handleOnClickFormState('Details')}
+                        className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Details" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                    >
+                        Project Details
+                    </p>
+                    <p
+                        onClick={() => handleOnClickFormState('Status')}
+                        className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Status" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                    >
+                        Project Status Automation
+                    </p>
+                    <p
+                        onClick={() => handleOnClickFormState('Quality')}
+                        className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Quality" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
+                    >
+                        Quality Assurance
+                    </p>
                 </div>
-            </>
-        </MainLayout>
+                <div className="ml-[5%] rounded-[10px] border border-black flex-1 p-[20px]">
+                    <form onSubmit={handleSubmit}>
+                        {formState === "Details" && (
+                            <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
+                        )}
+                        {formState === "Status" && (
+                            <DynamicStatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
+                        )}
+                        {formState === "Quality" && (
+                            <DynamicQualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
+                        )}
+                        <button type="submit" className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Create project</button>
+                        {success && <p className="text-red-500 mt-2">{success}</p>}
+                    </form>
+                </div>
+            </div>
+        </div>
     );
 }
 
