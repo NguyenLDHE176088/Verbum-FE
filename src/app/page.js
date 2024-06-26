@@ -2,7 +2,11 @@
 
 import { MainLayout } from "@/components/layouts/MainLayout";
 import UserInfor from "@/components/auth/user-infor";
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { LanguageContextProvider } from "@/context/languageContext";
+
+export const LanguageContext = createContext();
+
 
 export default function Home() {
     const [isCompany, setIsCompany] = useState(null);

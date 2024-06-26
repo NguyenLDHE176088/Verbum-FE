@@ -12,14 +12,10 @@ import { useRouter } from "next/navigation";
 import { getUserIdFromCookie } from "@/lib/auth";
 
 interface CreateUserProps {
-  languages: Language[];
   setLanguages: React.Dispatch<React.SetStateAction<Language[]>>;
 }
 
-export const Form: React.FC<CreateUserProps> = ({
-  languages,
-  setLanguages,
-}) => {
+export const Form: React.FC<CreateUserProps> = ({ setLanguages }) => {
   const router = useRouter();
   const [creatorId, setCreatorId] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
@@ -153,7 +149,6 @@ export const Form: React.FC<CreateUserProps> = ({
             <Label>
               <span className="text-md font-semibold">Source Language</span>
               <LanguageSelector
-                languages={languages}
                 selectedLanguages={selectedSourceLanguages}
                 setSelectedLanguages={setSelectedSourceLanguages}
                 type="source"
@@ -162,7 +157,6 @@ export const Form: React.FC<CreateUserProps> = ({
             <Label>
               <span className="text-md font-semibold">Target Language</span>
               <LanguageSelector
-                languages={languages}
                 selectedLanguages={selectedTargetLanguages}
                 setSelectedLanguages={setSelectedTargetLanguages}
                 type="target"
