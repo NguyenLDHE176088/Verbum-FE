@@ -50,7 +50,6 @@ export default function CreateProject() {
     const createProjectData = async () => {
         const user = await getUser();
         const id = user.id;
-        console.log(id);
 
         const { name, sourceLanguage, targetLanguages, dueDate, metadata } = detailsForm;
         const { emailed, accepted, completed, delivered, canceled } = statusForm;
@@ -119,7 +118,6 @@ export default function CreateProject() {
 
     const createProject = async () => {
         const projectData = await createProjectData();
-        console.log(projectData);
         const result = await createProjectFromAPI(projectData);
         if (result.success) {
             setSuccess('Project created successfully!');

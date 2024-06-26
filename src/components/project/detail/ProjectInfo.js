@@ -23,7 +23,6 @@ export default function ProjectInfo({ id }) {
             const result = await getProjectFromAPI(projectId);
             if (result.success) {
                 setData(result.success.data);
-                console.log(result.success.data);
             } else {
                 console.error('Error fetching project:', result.error);
             }
