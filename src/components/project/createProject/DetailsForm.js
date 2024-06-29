@@ -15,7 +15,7 @@ function DetailsForm({ detailsForm, handleDetailsChange }) {
         handleDetailsChange({
             target: {
                 name: 'sourceLanguage',
-                value: selectedLanguages[0]||""
+                value: selectedLanguages[0] || ""
             }
         });
     }
@@ -28,11 +28,32 @@ function DetailsForm({ detailsForm, handleDetailsChange }) {
                     required />
             </div>
             <div className="mb-[15px]">
-                <LanguageSelector name={"Source Language*"} onLanguagesChange={handleSourceLanguagesChange} allowMultipleChoice={false} />
+                <LanguageSelector name={"Source Language*"} onLanguagesChange={handleSourceLanguagesChange} allowMultipleChoice={false} required />
             </div>
             <div className="mb-[15px]">
-                <LanguageSelector name={"Target Language*"} onLanguagesChange={handleTargetLanguagesChange} allowMultipleChoice={true} />
+                <LanguageSelector name={"Target Language*"} onLanguagesChange={handleTargetLanguagesChange} allowMultipleChoice={true} required />
             </div>
+
+            <div className="mb-[15px]">
+                <label>Client name*</label>
+                <input type="text" name="clientName" value={detailsForm.clientName} onChange={handleDetailsChange}
+                    className="w-full p-[10px] border border-[#ddd] rounded"
+                    required />
+            </div>
+            <div className="mb-[15px]">
+                <label>Client email*</label>
+                <input type="text" name="clientEmail" value={detailsForm.clientEmail} onChange={handleDetailsChange}
+                    className="w-full p-[10px] border border-[#ddd] rounded"
+                    required />
+            </div>
+            {(detailsForm.clientEmail && detailsForm.clientEmail.trim() !== "") &&
+                <div className="mb-[15px]">
+                    <span>Create a guest account for client</span>
+                    <input type="checkbox" name="allowCreateGuestAccount" value={detailsForm.allowCreateGuestAccount} onChange={handleDetailsChange}
+                        className=" p-[10px] border border-[#ddd] rounded ml-5 w-4 h-4"
+                        required />
+                </div>
+            }
             <div className="mb-[15px]">
                 <label>Due Date *</label>
                 <input type="date" name="dueDate" value={detailsForm.dueDate} onChange={handleDetailsChange}

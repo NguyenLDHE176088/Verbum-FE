@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createProjectFromAPI } from '@/data/projects';
 import { getUser } from '@/lib/cookies'
 import { useRouter } from 'next/navigation';
+import { TriangleAlert } from 'lucide-react';
 
 
 const DynamicDetailsForm = dynamic(() => import('@/components/project/createProject/DetailsForm'));
@@ -16,7 +17,10 @@ export default function CreateProject() {
         sourceLanguage: '',
         targetLanguages: [],
         dueDate: '',
-        metadata: ''
+        metadata: '',
+        clientName: '',
+        clientEmail: '',
+        allowCreateGuestAccount: false
     }
 
     const status = {
@@ -46,14 +50,17 @@ export default function CreateProject() {
     const [detailsForm, setDetailsForm] = useState(details);
     const [statusForm, setStatusForm] = useState(status);
     const [qualityForm, setQualityForm] = useState(quality);
+    const [errorMessages, setErrorMessages] = useState([]);
     const router = useRouter();
 
     const createProjectData = async () => {
         const user = await getUser();
         const id = user.id;
 
-        const { name, sourceLanguage, targetLanguages, dueDate, metadata } = detailsForm;
+        const { name, sourceLanguage, targetLanguages, dueDate, metadata,clientName,clientEmail,allowCreateGuestAccount } = detailsForm;
+
         const { emailed, accepted, completed, delivered, canceled } = statusForm;
+
         const {
             emptyTarget,
             extraNumber,
@@ -72,64 +79,99 @@ export default function CreateProject() {
         const markProjectAssigned = emailed ? "emailed" : accepted ? "accepted" : "Not Assigned";
         const markProjectCompleted = completed ? "completed" : delivered ? "delivered" : "Not Completed";
         const markProjectCanceled = canceled;
-        const body = {
-            name,
-            createBy: id,
-            description: "This is a new project",
-            status: "Active",
-            owner: id,
-            sourceLanguage,
-            dueDate: new Date(dueDate).toISOString(),
-            clientName: "Client A",
-            metadata,
-            markProjectAssigned,
-            markProjectCompleted,
-            markProjectCanceled,
-            emptyTargetQA: emptyTarget.check,
-            emptyTargetIgnore: emptyTarget.ignore,
-            extraNumberInTargetQA: extraNumber.check,
-            extraNumberInTargetIgnore: extraNumber.ignore,
-            inconsistentInTargetQA: inconsistentTarget.check,
-            inconsistentInTargetIgnore: inconsistentTarget.ignore,
-            leadingAndTrailingSpaceQA: leadingSpace.check,
-            leadingAndTrailingSpaceIgnore: leadingSpace.ignore,
-            maxTargetLengthPercentage: maxSegmentLengthPercent.value,
-            maxTargetLengthPercentageQA: maxSegmentLengthPercent.check,
-            maxTargetLengthPercentageIgnore: maxSegmentLengthPercent.ignore,
-            maxTargetLengthCharacter: maxTargetSegmentLengthInCharacters.value,
-            maxTargetLengthCharacterQA: maxTargetSegmentLengthInCharacters.check,
-            maxTargetLengthCharacterIgnore: maxTargetSegmentLengthInCharacters.ignore,
-            missingNumberQA: missingNumber.check,
-            missingNumberIgnore: missingNumber.ignore,
-            missingSpaceQA: missingSpaces.check,
-            missingSpaceIgnore: missingSpaces.ignore,
-            repeatedWordQA: repeatedWords.check,
-            repeatedWordIgnore: repeatedWords.ignore,
-            spellingQA: spelling.check,
-            spellingIgnore: spelling.ignore,
-            targetTextIdenticalQA: identicalText.check,
-            targetTextIdenticalIgnore: identicalText.ignore,
-            targetLanguages: targetLanguages,
-            progress: 0
-        };
 
+        let body = {}
+
+        try {
+            body = {
+                name,
+                createBy: id,
+                description: "This is a new project",
+                status: "Active",
+                owner: id,
+                sourceLanguage,
+                dueDate: new Date(dueDate).toISOString(),
+                clientName,
+                clientEmail,
+                allowCreateGuestAccount,
+                metadata,
+                markProjectAssigned,
+                markProjectCompleted,
+                markProjectCanceled,
+                emptyTargetQA: emptyTarget.check,
+                emptyTargetIgnore: emptyTarget.ignore,
+                extraNumberInTargetQA: extraNumber.check,
+                extraNumberInTargetIgnore: extraNumber.ignore,
+                inconsistentInTargetQA: inconsistentTarget.check,
+                inconsistentInTargetIgnore: inconsistentTarget.ignore,
+                leadingAndTrailingSpaceQA: leadingSpace.check,
+                leadingAndTrailingSpaceIgnore: leadingSpace.ignore,
+                maxTargetLengthPercentage: maxSegmentLengthPercent.value,
+                maxTargetLengthPercentageQA: maxSegmentLengthPercent.check,
+                maxTargetLengthPercentageIgnore: maxSegmentLengthPercent.ignore,
+                maxTargetLengthCharacter: maxTargetSegmentLengthInCharacters.value,
+                maxTargetLengthCharacterQA: maxTargetSegmentLengthInCharacters.check,
+                maxTargetLengthCharacterIgnore: maxTargetSegmentLengthInCharacters.ignore,
+                missingNumberQA: missingNumber.check,
+                missingNumberIgnore: missingNumber.ignore,
+                missingSpaceQA: missingSpaces.check,
+                missingSpaceIgnore: missingSpaces.ignore,
+                repeatedWordQA: repeatedWords.check,
+                repeatedWordIgnore: repeatedWords.ignore,
+                spellingQA: spelling.check,
+                spellingIgnore: spelling.ignore,
+                targetTextIdenticalQA: identicalText.check,
+                targetTextIdenticalIgnore: identicalText.ignore,
+                targetLanguages: targetLanguages,
+                progress: 0
+            };
+        } catch (error) {
+            const newErrorMessages = [error.message, errorMessages];
+            setErrorMessages(newErrorMessages.flat());
+        }
         return body;
     };
 
+    const projectDataValidation = (data) => {
+        let errors = [];
+
+        if (!data.name || data.name.trim() === "") {
+            errors.push("Project name is required");
+        }
+
+        if (!data.sourceLanguage || data.sourceLanguage.trim() === "") {
+            errors.push("Source Language is required");
+        }
+
+        if (!data.targetLanguages || data.targetLanguages.length == 0) {
+            errors.push("Target Languages is required");
+        }
+
+        if (!data.clientName || data.clientName.trim() === "") {
+            errors.push("Target Languages is required");
+        }
+        // Additional validations can be added here
+    
+        setErrorMessages(errors);
+    }
 
     const createProject = async () => {
         const projectData = await createProjectData();
-        const result = await createProjectFromAPI(projectData);
-        if (result.success) {
-            setSuccess('Project created successfully!');
-            setDetailsForm(details);
-            setStatusForm(status);
-            setQualityForm(quality);
-            router.push('/projects');
-        } else {
-            console.error('Error deleting projects:', result.error);
-        }
-    };
+        projectDataValidation(projectData);
+        if (errorMessages.length == 0) {
+            const result = await createProjectFromAPI(projectData);
+            if (result.success) {
+                setSuccess('Project created successfully!');
+                setDetailsForm(details);
+                setStatusForm(status);
+                setQualityForm(quality);
+                router.push('/projects');
+            } else {
+                setErrorMessages('Can not create new project!');
+                console.error('Error create projects:', result.error);
+            }
+        };
+    }
 
 
 
@@ -189,9 +231,9 @@ export default function CreateProject() {
 
 
     const handleSubmit = (e) => {
+        setErrorMessages([]);
         e.preventDefault();
-        createProject();
-
+        Promise.resolve(createProject());
     };
 
     return (
@@ -241,6 +283,15 @@ export default function CreateProject() {
                             </>
                         }
                         {success && <p className="text-red-500 mt-2">{success}</p>}
+                        {
+                            errorMessages.length > 0 ?
+                                (<div className='bg-destructive/15 items-center text-destructive flex flex-row gap-2 p-3 rounded mt-2'>
+                                    <TriangleAlert />
+                                    <p>{errorMessages.toString()}</p>
+                                </div>)
+                                :
+                                (<></>)
+                        }
                     </form>
                 </div>
             </div>
