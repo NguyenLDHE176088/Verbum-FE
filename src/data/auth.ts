@@ -1,5 +1,7 @@
 'use client'
 
+import {NextRequest, NextResponse} from "next/server";
+
 interface RegisterFormProps {
     username: string
     email: string
@@ -42,4 +44,21 @@ export async function login(body: LoginFormProps) {
         return {error: await response.json()}
     }
     return {success: await response.json()}
+}
+
+export async function refreshToken(nextResponse: NextResponse, refToken: string, request: NextRequest) {
+    const response = await fetch('http://localhost:9999/auth/refresh-token', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({refToken: refToken})
+    })
+    if (response.status === 500) {
+        return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
+    const data = await response.json()
+    nextResponse.cookies.set('token', data.token)
+    return nextResponse
 }
