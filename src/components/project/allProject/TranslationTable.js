@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import * as React from 'react';
-import { useState,useRef,useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Checkbox, LinearProgress, IconButton,
@@ -18,8 +18,7 @@ import { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import Link from 'next/link';
 import { format } from 'date-fns';
-import {getAllProjects,deleteProjectsFromAPI} from '@/data/projects';
-
+import { getAllProjects, deleteProjectsFromAPI } from '@/data/projects';
 
 export default function TranslationTable() {
     const [translations, setTranslations] = useState([]);
@@ -46,7 +45,6 @@ export default function TranslationTable() {
     };
 
     useEffect(() => {
-
         fetchProjects();
     }, []);
 
@@ -108,13 +106,11 @@ export default function TranslationTable() {
         setAnchorElfilter(null);
     };
 
-
     const handleClickDelete = () => {
         setOpen(true);
     };
 
     const handleClose = () => {
-
         setOpen(false);
     };
 
@@ -122,9 +118,6 @@ export default function TranslationTable() {
         deleteProject();
         setOpen(false);
     };
-
-
-
 
     const handleSortClick = (event) => {
         setAnchorElSort(event.currentTarget);
@@ -136,7 +129,7 @@ export default function TranslationTable() {
                 [...translations].sort((a, b) => {
                     const dateA = new Date(a.createdAt.split('/').reverse().join('-'));
                     const dateB = new Date(b.createdAt.split('/').reverse().join('-'));
-                    return status.toLowerCase() === 'Ascending'.toLowerCase()? dateA - dateB : dateB - dateA;
+                    return status.toLowerCase() === 'Ascending'.toLowerCase() ? dateA - dateB : dateB - dateA;
                 }));
         }
         if (sortBy === 'Due') {
@@ -144,25 +137,24 @@ export default function TranslationTable() {
                 [...translations].sort((a, b) => {
                     const dateA = new Date(a.dueDate.split('/').reverse().join('-'));
                     const dateB = new Date(b.dueDate.split('/').reverse().join('-'));
-                    return status.toLowerCase() === 'Ascending'.toLowerCase()? dateA - dateB : dateB - dateA;
+                    return status.toLowerCase() === 'Ascending'.toLowerCase() ? dateA - dateB : dateB - dateA;
                 }));
         }
 
         if (sortBy === 'Progress') {
             setTranslationsBackUp(
                 [...translations].sort((a, b) => {
-                    return status.toLowerCase() === 'Ascending'.toLowerCase()?a.progress - b.progress:b.progress-a.progress;
+                    return status.toLowerCase() === 'Ascending'.toLowerCase() ? a.progress - b.progress : b.progress - a.progress;
                 }));
         }
 
         if (sortBy === 'All') {
             setTranslationsBackUp([...translations].sort((a, b) => {
-                return status.toLowerCase() === 'Ascending'.toLowerCase()?a.id - b.id:b.id-a.id;
+                return status.toLowerCase() === 'Ascending'.toLowerCase() ? a.id - b.id : b.id - a.id;
             }));
         }
         setAnchorElSort(null);
     };
-
 
     const handleSortChange = (event) => {
         setSortBy(event.target.value);
@@ -174,14 +166,13 @@ export default function TranslationTable() {
         ));
     };
 
-    const handleChange=(name,id)=>{
+    const handleChange = (name, id) => {
         setIds(
-            ids.includes(id)?ids.filter(i=>i!==id):[...ids,id]
+            ids.includes(id) ? ids.filter(i => i !== id) : [...ids, id]
         );
         setNames(
-            names.includes(name)?names.filter(n=>n!==name):[...names,name]
+            names.includes(name) ? names.filter(n => n !== name) : [...names, name]
         );
-
     }
 
     const handleClickOutside = (event) => {
@@ -194,14 +185,12 @@ export default function TranslationTable() {
         }
     };
 
-
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-
 
     return (
         <div className="flex justify-center">
@@ -235,7 +224,6 @@ export default function TranslationTable() {
                             <MenuItem value="Progress">Progress</MenuItem>
                             <MenuItem value="Created">Created</MenuItem>
                             <MenuItem value="Due">Due</MenuItem>
-
                         </Select>
                     </FormControl>
                     <div className="w-1/2 flex justify-between">
@@ -291,13 +279,11 @@ export default function TranslationTable() {
                         </Tooltip>
                         <Tooltip title="Add">
                             <Link href={"/projects/create"} >
-
                                 <Box className="cursor-pointer flex bg-[#FF9300] justify-center items-center rounded-tr-[10px]" >
                                     <Box className="m-[5px] flex items-center p-[5px] bg-[#F3F3F3] rounded-full"  >
-                                        <AddIcon  className="text-[#FF9300] text-[15px]" />
+                                        <AddIcon className="text-[#FF9300] text-[15px]" />
                                     </Box>
                                 </Box>
-
                             </Link>
                         </Tooltip>
                     </div>
@@ -318,16 +304,15 @@ export default function TranslationTable() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rowsToShow.map((row) => (
+                            {rowsToShow.map((row, index) => (
                                 <TableRow key={row.id} className="table-row">
                                     <TableCell padding="checkbox">
-                                        <Checkbox  
-                                            onChange={()=>handleChange(row.name,row.id)}
+                                        <Checkbox
+                                            onChange={() => handleChange(row.name, row.id)}
                                             checked={ids.includes(row.id)}
-                                        
                                         />
                                     </TableCell>
-                                    <TableCell>{row.id}</TableCell>
+                                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                                     <TableCell className="underline"><Link href={`/projects/${row.id}`}>{row.name}</Link></TableCell>
                                     <TableCell className="table-cell-progress">
                                         <CustomLinearProgress variant="determinate" value={row.progress}
@@ -369,12 +354,9 @@ export default function TranslationTable() {
                         <Button onClick={handleClose} color="primary" variant="contained" style={{ backgroundColor: 'black', }}>
                             Cancel
                         </Button>
-
                     </DialogActions>
                 </Dialog>
             </div>
         </div>
-
     );
 }
-

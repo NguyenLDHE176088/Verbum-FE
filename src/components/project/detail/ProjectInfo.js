@@ -83,7 +83,7 @@ export default function ProjectInfo({ id }) {
                                     <span>
                                         <Badge variant="secondary">{data.sourceLanguage}</Badge>
                                     </span>
-                                    || <p>none</p>
+                                    || <span>none</span>
                                 }</div>
                             </div>
                             <div className={classes.displayObject}>
@@ -93,7 +93,7 @@ export default function ProjectInfo({ id }) {
                                         <span key={language.projectId}>
                                             <Badge variant="secondary">{language.languageCode}</Badge>
                                         </span>
-                                    )) || <p>none</p>
+                                    )) || <span>none</span>
                                 }</div>
                             </div>
                         </div>

@@ -1,11 +1,12 @@
 "use client"
 import dynamic from 'next/dynamic';
-import DetailsForm from '@/components/project/createProject/DetailsForm';
 import { useState } from 'react';
 import { createProjectFromAPI } from '@/data/projects';
 import { getUser } from '@/lib/cookies'
 import { useRouter } from 'next/navigation';
 
+
+const DynamicDetailsForm = dynamic(() => import('@/components/project/createProject/DetailsForm'));
 const DynamicQualityForm = dynamic(() => import('@/components/project/createProject/QualityForm.js'));
 const DynamicStatusForm = dynamic(() => import('@/components/project/createProject/StatusForm'));
 
@@ -198,18 +199,21 @@ export default function CreateProject() {
             <div className="flex flex-row overflow-hidden w-[95%]" >
                 <div className="p-4 rounded-lg border-black border-solid border w-[40%]" >
                     <p
+                        role="presentation"
                         onClick={() => handleOnClickFormState('Details')}
                         className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Details" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
                     >
                         Project Details
                     </p>
                     <p
+                        role="presentation"
                         onClick={() => handleOnClickFormState('Status')}
                         className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Status" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
                     >
                         Project Status Automation
                     </p>
                     <p
+                        role="presentation"
                         onClick={() => handleOnClickFormState('Quality')}
                         className={`cursor-pointer mb-[10px] p-[10px] ${formState === "Quality" ? 'font-bold rounded-[20px] border border-[#00BFA6]' : ''}`}
                     >
@@ -218,21 +222,29 @@ export default function CreateProject() {
                 </div>
                 <div className="ml-[5%] rounded-[10px] border border-black flex-1 p-[20px]">
                     <form onSubmit={handleSubmit}>
-                        {formState === "Details" && (
-                            <DetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
-                        )}
-                        {formState === "Status" && (
-                            <DynamicStatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
-                        )}
-                        {formState === "Quality" && (
-                            <DynamicQualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
-                        )}
-                        <button type="submit" className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Create project</button>
+                        {formState === "Details" &&
+                            <>
+                                <DynamicDetailsForm detailsForm={detailsForm} handleDetailsChange={handleDetailsChange} />
+                                <button onClick={() => handleOnClickFormState('Status')} className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Next</button>
+                            </>
+                        }
+                        {formState === "Status" &&
+                            <>
+                                <DynamicStatusForm statusForm={statusForm} handleStatusChange={handleStatusChange} />
+                                <button onClick={() => handleOnClickFormState('Quality')} className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Next</button>
+                            </>
+                        }
+                        {formState === "Quality" &&
+                            <>
+                                <DynamicQualityForm qualityForm={qualityForm} handleQualityChange={handleQualityChange} />
+                                <button type="submit" className="px-5 py-2 bg-black text-white border-none rounded cursor-pointer">Create project</button>
+                            </>
+                        }
                         {success && <p className="text-red-500 mt-2">{success}</p>}
                     </form>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

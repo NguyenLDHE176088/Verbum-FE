@@ -1,8 +1,5 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { LanguageContextProvider } from "@/context/languageContext";
-import { MainLayout } from "@/components/layouts/MainLayout";
-import { UserContextProvider } from "@/context/userContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,10 +12,7 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en" className={module.css}>
             <body suppressHydrationWarning={true} className={inter.className}>
-                <LanguageContextProvider>
-                    {children}
-                </LanguageContextProvider>
-                <h1>Ko co o nav 3 root</h1>
+                {children}
             </body>
         </html>
     );

@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "/src/app/globals.css";
 import { MainLayout } from "@/components/layouts/MainLayout";
+import { LanguageContextProvider } from "@/context/languageContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,11 +13,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <html lang="en" className={module.css}>
-            <body suppressHydrationWarning={true} className={inter.className}>
-                <MainLayout>
-                    {children}
-                </MainLayout>
-            </body>
+            <LanguageContextProvider>
+                <body suppressHydrationWarning={true} className={inter.className}>
+                    <MainLayout>
+                        {children}
+                    </MainLayout>
+                </body>
+            </LanguageContextProvider>
         </html>
     );
 }
