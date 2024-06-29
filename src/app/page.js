@@ -1,5 +1,5 @@
 'use client'
-
+import "./globals.css";
 import UserInfor from "@/components/auth/user-infor";
 import { useEffect, useState } from "react";
 

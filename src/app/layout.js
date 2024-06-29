@@ -15,7 +15,10 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en" className={module.css}>
             <body suppressHydrationWarning={true} className={inter.className}>
-                {children}
+                <LanguageContextProvider>
+                    {children}
+                </LanguageContextProvider>
+                <h1>Ko co o nav 3 root</h1>
             </body>
         </html>
     );
