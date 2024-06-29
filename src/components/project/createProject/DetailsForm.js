@@ -1,16 +1,21 @@
 "use client";
-import { LanguageContext } from '@/context/languageContext';
-import TargetLanguageSelector from './TargetLanguageSelector.js';
-import { useContext } from 'react';
+import LanguageSelector from './LanguageSelector.js';
 
 function DetailsForm({ detailsForm, handleDetailsChange }) {
-    const languages = useContext(LanguageContext);
 
-    const handleLanguagesChange = (selectedLanguages) => {
+    const handleTargetLanguagesChange = (selectedLanguages) => {
         handleDetailsChange({
             target: {
                 name: 'targetLanguages',
                 value: selectedLanguages
+            }
+        });
+    }
+    const handleSourceLanguagesChange = (selectedLanguages) => {
+        handleDetailsChange({
+            target: {
+                name: 'sourceLanguage',
+                value: selectedLanguages[0]||""
             }
         });
     }
@@ -23,26 +28,10 @@ function DetailsForm({ detailsForm, handleDetailsChange }) {
                     required />
             </div>
             <div className="mb-[15px]">
-                <label>Source language *</label>
-                <select
-
-                    name="sourceLanguage"
-                    value={detailsForm.sourceLanguage}
-                    onChange={handleDetailsChange}
-                    className="w-full p-[10px] border border-[#ddd] rounded"
-                    required
-                >
-                    <option value="" disabled hidden>Select a language</option>
-                    {languages.map(language => (
-                        <option key={`${language.id}-${language.code}`} value={language.code}>
-                            {language.name}
-                        </option>
-                    ))}
-                </select>
+                <LanguageSelector name={"Source Language*"} onLanguagesChange={handleSourceLanguagesChange} allowMultipleChoice={false} />
             </div>
-
             <div className="mb-[15px]">
-                <TargetLanguageSelector onLanguagesChange={handleLanguagesChange} />
+                <LanguageSelector name={"Target Language*"} onLanguagesChange={handleTargetLanguagesChange} allowMultipleChoice={true} />
             </div>
             <div className="mb-[15px]">
                 <label>Due Date *</label>
