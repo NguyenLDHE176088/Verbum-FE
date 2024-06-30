@@ -44,7 +44,11 @@ export default function LoginForm() {
       if (response.success) {
         localStorage.setItem("isCompany", response.success.isHasCompany);
         changeUserData({ isLogin: true });
-        router.push("/");
+        if(response.success.isHasCompany){
+          router.push("/projects");
+        }else{
+          router.push("/");
+        }
       }
     });
   };

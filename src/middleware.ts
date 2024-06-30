@@ -14,8 +14,12 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next()
     }
 
-    if (!token) {
+    if (!token && refToken) { //don't have token but have refToken
        return await refreshToken(nextResponse, refToken, request)
+    }
+    if(!token && ! refToken){ //don't have both
+        //it's mean logout
+        return NextResponse.redirect(new URL('/auth/login', request.url));
     }
 
     const verify = await verifyToken(token)
