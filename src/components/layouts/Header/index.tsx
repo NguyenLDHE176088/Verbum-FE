@@ -10,7 +10,6 @@ import {
   ShoppingCart,
   Users,
 } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,11 +21,9 @@ import {
 } from "@/components/ui/card";
 import {
   Breadcrumb,
-  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
@@ -38,12 +35,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { clearCookies } from "@/utils/cookieUtils.js";
+import { logout } from "@/data/auth";
 
 export function Header() {
   const pathname = usePathname();
   const [breadcrumbs, setBreadcrumbs] = useState([]);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logout(); // Wait for logout operation to complete
+      await clearCookies("token");
+      await clearCookies("refToken");
+      router.replace("/auth/login");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   useEffect(() => {
     if (pathname) {
@@ -169,7 +180,7 @@ export function Header() {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
