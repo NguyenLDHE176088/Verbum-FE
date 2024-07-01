@@ -1,33 +1,48 @@
 "use client";
-import { createContext, useMemo, useState } from "react";
+import React, { createContext, useMemo } from "react";
 
 interface UserData {
-  userData: {
-    isLogin: boolean;
-  };
-  changeUserData: (data: any) => void;
+  isLogin: boolean;
+  isHasCompany: boolean;
 }
 
-export const UserContext = createContext<UserData>({
-  userData: { isLogin: false },
-  changeUserData: (data) => {},
+interface UserContextType {
+  userData: UserData;
+  changeUserData: (data: Partial<UserData>) => void;
+}
+
+export const UserContext = createContext<UserContextType>({
+  userData: { isLogin: false, isHasCompany: false },
+  changeUserData: () => {},
 });
 
-export const UserContextProvider = ({
+export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
-}: Readonly<{ children: React.ReactNode }>) => {
-  const [userData, setUserData] = useState({ isLogin: false });
+}) => {
+  const [userData, setUserData] = React.useState<UserData>({
+    isLogin: false,
+    isHasCompany: false,
+  });
 
   const changeUserData = useMemo(
-    () => (data) => {
-      setUserData(data);
+    () => (data: Partial<UserData>) => {
+      console.log('Updating userData:', data); // Log state updates
+      setUserData((prevUserData) => {
+        const newUserData = { ...prevUserData, ...data };
+        console.log('New userData state:', newUserData); // Log new state
+        return newUserData;
+      });
     },
     []
   );
+  
 
   const contextValue = useMemo(
-    () => ({ userData, changeUserData }),
-    [userData, changeUserData]
+    () => ({
+      userData,
+      changeUserData,
+    }),
+    [userData]
   );
 
   return (

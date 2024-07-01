@@ -1,4 +1,10 @@
 "use client";
+import { useEffect, useContext, useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { UserContext } from "@/context/userContext";
 import {
   Form,
   FormControl,
@@ -8,19 +14,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
-import { LoginSchema } from "@/schema/auth";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import VerbumLogo from "../../../public/verbum_logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import { useContext, useState, useTransition } from "react";
 import { login } from "@/data/auth";
 import FormError from "@/components/auth/form-error";
-import { useRouter } from "next/navigation";
-import { UserContext } from "@/context/userContext";
+import { LoginSchema } from "@/schema/auth";
 
 export default function LoginForm() {
   const [isPending, startTransition] = useTransition();
@@ -40,18 +40,24 @@ export default function LoginForm() {
       const response = await login(value);
       if (response.error) {
         setError("Invalid username or password");
-      }
-      if (response.success) {
-        localStorage.setItem("isCompany", response.success.isHasCompany);
-        changeUserData({ isLogin: true });
-        if(response.success.isHasCompany){
+      } else {
+        changeUserData({
+          isLogin: true,
+          isHasCompany: response.success.isHasCompany,
+        });
+        console.log('UserData after login:', userData);
+        if (response.success.isHasCompany) {
           router.push("/projects");
-        }else{
+        } else {
           router.push("/");
         }
       }
     });
   };
+
+  useEffect(() => {
+    console.log('UserData in LoginForm after state update:', userData);
+  }, [userData]);
 
   return (
     <Form {...form}>
