@@ -8,6 +8,7 @@ import { format, set } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
@@ -37,6 +38,7 @@ import {
 import { fetchUserCompany } from "@/data/company";
 import { fetchUsersBySourceAndTargetLanguage } from "@/data/users";
 import { createJob } from "@/data/job";
+import { Http } from "@mui/icons-material";
 
 const FormSchema = z.object({
   file: z.custom(
@@ -78,6 +80,7 @@ export function CreateJobScreen({ projectId }) {
   const [checkedLanguages, setCheckedLanguages] = useState({});
   const [isQaNeededState, setIsQaNeededState] = useState({});
   const [selectedUsers, setSelectedUsers] = useState({});
+  const [selectedQAs, setSelectedQAs] = useState({});
   const router = useRouter();
 
   const getUserId = async () => {
@@ -148,6 +151,13 @@ export function CreateJobScreen({ projectId }) {
     }));
   };
 
+  const handleQaSelection = (code, users) => {
+    setSelectedQAs((prev) => ({
+      ...prev,
+      [code]: users,
+    }));
+  };
+
   const handleQaCheckboxChange = (id) => {
     setIsQaNeededState((prev) => ({
       ...prev,
@@ -184,16 +194,24 @@ export function CreateJobScreen({ projectId }) {
           fileExtension: `.${data.file.name.split(".").pop()}`,
           status: "new",
           documentUrl: downloadURL,
-          isQaNeeded: isQaNeededState[languageId] || false,
+          qaRequired: {
+            isUseQA: isQaNeededState[languageId] || false,
+            reviewerId: selectedQAs[languageId]?.[0]?.id || "",
+          },
         };
 
         jobsPayload.push(jobPayload);
       }
     });
-    createJob(jobsPayload);
+    const createJobResponse = await createJob(jobsPayload);
 
-    window.alert("Job created successfully!");
-    router.push("/jobs");
+    if (createJobResponse.status === 201) {
+      if (window.confirm("Job created successfully! Click OK to view jobs.")) {
+        router.push("/jobs");
+      }
+    } else {
+      window.alert("Error creating job. Please try again.");
+    }
   };
 
   if (!userCompany || !projectSourceLanguage || !projectTargetLanguages) {
@@ -208,7 +226,7 @@ export function CreateJobScreen({ projectId }) {
           name="file"
           render={({ field: { onChange } }) => (
             <FormItem>
-              <FormLabel>File</FormLabel>
+              <FormLabel className="text-xl">File</FormLabel>
               <FormControl>
                 <Input
                   type="file"
@@ -224,6 +242,7 @@ export function CreateJobScreen({ projectId }) {
         />
         {projectTargetLanguages.map((language, index) => (
           <>
+            <Separator />
             <FormField
               key={index}
               control={form.control}
@@ -235,7 +254,7 @@ export function CreateJobScreen({ projectId }) {
                     checked={!!checkedLanguages[language.code]}
                     onCheckedChange={() => handleCheckboxChange(language.code)}
                   />
-                  <FormLabel>{language.name}</FormLabel>
+                  <FormLabel className="text-xl bold">{`${language.code} - ${language.name}`}</FormLabel>
                   <FormControl>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -277,7 +296,7 @@ export function CreateJobScreen({ projectId }) {
               key={index}
               name={`isQaNeeded[${index}]` as any}
               render={() => (
-                <FormItem>
+                <FormItem className="ml-10">
                   <Checkbox
                     className="mr-3"
                     disabled={!checkedLanguages[language.code]}
@@ -286,13 +305,43 @@ export function CreateJobScreen({ projectId }) {
                       handleQaCheckboxChange(language.code)
                     }
                   />
-                  <FormLabel>QA needed</FormLabel>
+                  <FormLabel>Enable QA process</FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Add QA instructions"
-                      disabled={!isQaNeededState[language.code]}
-                    />
+                    <Popover>
+                      <PopoverTrigger
+                        asChild
+                        disabled={!isQaNeededState[language.code]}
+                      >
+                        <Button
+                          variant="outline"
+                          className="justify-start ml-3"
+                        >
+                          {selectedQAs[language.code]?.length > 0
+                            ? `${selectedQAs[language.code]
+                                .map(
+                                  (user) => user.lastName + " " + user.firstName
+                                )
+                                .join(", ")}`
+                            : "Choose QA"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0" align="start">
+                        <UserList
+                          users={(
+                            selectedTargetLanguages.find(
+                              (lang) => lang.code === language.code
+                            )?.users || []
+                          ).filter(
+                            (user) =>
+                              user.id !== selectedUsers[language.code]?.[0]?.id
+                          )}
+                          selectedUsers={selectedQAs[language.code] || []}
+                          onUserSelection={(users) =>
+                            handleQaSelection(language.code, users)
+                          }
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -305,7 +354,7 @@ export function CreateJobScreen({ projectId }) {
           name="duedate"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Due date</FormLabel>
+              <FormLabel className="text-xl">Due date</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
