@@ -14,6 +14,11 @@ interface LoginFormProps {
     password?: string
 }
 
+interface RefreshTokenProps {
+    message: string
+    token: string
+}
+
 export async function register(body: RegisterFormProps) {
     if (body.password !== body.confirmPassword) {
         return { error: { message: 'Passwords do not match' } }
@@ -53,13 +58,19 @@ export async function refreshToken(nextResponse: NextResponse, refToken: string,
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ refToken: refToken })
+        body: JSON.stringify({refToken: refToken})
     })
     if (response.status === 500) {
         return NextResponse.redirect(new URL('/auth/login', request.url));
     }
-    const data = await response.json()
-    nextResponse.cookies.set('token', data.token)
+    // Set the new token in the cookie
+    const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    const data = await response.json() as RefreshTokenProps
+    nextResponse.cookies.set({
+        name: 'token',
+        value: data.token,
+        expires: tokenExpiry
+    })
     return nextResponse
 }
 
