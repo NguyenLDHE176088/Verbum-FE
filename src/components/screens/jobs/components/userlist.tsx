@@ -16,46 +16,59 @@ type UserNameInfo = {
   id: string;
   firstName: string;
   lastName: string;
-}
+};
 
 type UserListProps = {
   users: UserNameInfo[];
-  selectedUsers: UserNameInfo[];
+  selectedUsers: UserNameInfo[]; // Consider changing this prop to a single UserNameInfo object or null for consistency.
   onUserSelection: (selectedUsers: UserNameInfo[]) => void;
 };
 
-export function UserList({ users, selectedUsers, onUserSelection }: UserListProps) {
-  const [internalSelectedUsers, setInternalSelectedUsers] =
-    useState<UserNameInfo[]>(selectedUsers);
+export function UserList({
+  users,
+  selectedUsers,
+  onUserSelection,
+}: UserListProps) {
+  const [internalSelectedUser, setInternalSelectedUser] =
+    useState<UserNameInfo | null>(selectedUsers[0] || null);
 
   useEffect(() => {
-    onUserSelection(internalSelectedUsers);
+    onUserSelection(internalSelectedUser ? [internalSelectedUser] : []);
   }, []);
 
   useEffect(() => {
-    setInternalSelectedUsers(selectedUsers);
+    setInternalSelectedUser(selectedUsers[0] || null);
   }, [selectedUsers]);
 
   const handleCheckboxChange = (user: UserNameInfo) => {
-    setInternalSelectedUsers((prev) =>
-      prev.includes(user)
-        ? prev.filter((u) => u.id !== user.id)
-        : [...prev, user]
-    );
+    setInternalSelectedUser((prev) => {
+      if (prev?.id === user.id) {
+        onUserSelection([]);
+        return null;
+      } else {
+        onUserSelection([user]);
+        return user;
+      }
+    });
   };
-
 
   return (
     <Command>
-      <CommandInput placeholder="Filter status..." />
+      <CommandInput placeholder="Filter Users..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup>
           {users.map((user) => (
-            <CommandItem key={user.id}>
-              <Checkbox 
+            <CommandItem
+              key={user.id}
+              disabled={
+                internalSelectedUser !== null &&
+                internalSelectedUser.id !== user.id
+              }
+            >
+              <Checkbox
                 className="mr-3"
-                checked={internalSelectedUsers.includes(user)}
+                checked={internalSelectedUser?.id === user.id}
                 onCheckedChange={() => handleCheckboxChange(user)}
               />
               {user.firstName} {user.lastName}
@@ -63,7 +76,6 @@ export function UserList({ users, selectedUsers, onUserSelection }: UserListProp
           ))}
         </CommandGroup>
       </CommandList>
-      <Button onClick={() => onUserSelection(internalSelectedUsers)}>Done</Button>
     </Command>
   );
 }

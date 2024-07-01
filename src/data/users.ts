@@ -118,3 +118,22 @@ export async function updateUser(id: string, body: any) {
     return { error: { message: error.message } };
   }
 }
+
+export const fetchUsersBySourceAndTargetLanguage = async (
+  companyId: string,
+  sourceLanguageCode: string,
+  targetLanguageCode: string
+) => {
+  try {
+    const response = await fetch(
+      `http://localhost:9999/jobs/find-by-source-target-language?companyId=${companyId}&sourceLanguageCode=${sourceLanguageCode}&targetLanguageCode=${targetLanguageCode}`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch target languages");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching target languages:", error);
+  }
+};
