@@ -26,7 +26,7 @@ const QualityForm = ({qualityForm,handleQualityChange}) => {
                   name={`${key}.value`}
                   value={qualityForm[key].value}
                   onChange={handleQualityChange}
-                  className="ml-[10px] w-[60px]"
+                  className="ml-[10px] w-[60px] border text-center"
                   placeholder="Enter value"
                 />
               )}

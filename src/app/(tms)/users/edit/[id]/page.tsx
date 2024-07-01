@@ -2,7 +2,6 @@
 import { User } from "@/models/users";
 import { getUser, updateUser } from "@/data/users";
 import { Input } from "@/components/ui/input";
-
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useParams } from "next/navigation";
