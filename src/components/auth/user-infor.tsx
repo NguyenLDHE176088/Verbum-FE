@@ -54,7 +54,6 @@ export default function UserInfor() {
       if (response.error) {
         console.log(response.error);
       } else {
-        localStorage.setItem("isCompany", "true");
         router.push("/jobs");
       }
     });

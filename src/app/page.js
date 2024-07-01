@@ -1,26 +1,27 @@
 "use client"
+import { useEffect, useContext } from "react";
+import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState  } from "react";
 import dynamic from "next/dynamic";
-import "@/components/auth/user-infor.tsx";
-import "./globals.css";
 
 const DynamicUserInfor = dynamic(() => import("@/components/auth/user-infor.tsx"));
 
 export default function Home() {
-    const router = useRouter();
-    const [isCompany, setIsCompany] = useState(false);
+  const router = useRouter();
+  const { userData } = useContext(UserContext);
+  console.log("Home component userData:", userData);
 
-    useEffect(() => {
-        const companyStatus = Boolean(localStorage.getItem("isCompany"));
-        setIsCompany(companyStatus);
-    }, []);
+  useEffect(() => {
+    if (userData.isLogin) {
+      if (userData.isHasCompany) {
+        router.push("/projects");
+      }
+    }
+  }, [userData, router]);
 
-    useEffect(() => {
-        if (isCompany) {
-            router.push("/projects");
-        }   
-    }, [isCompany]);
-
+  if (!userData.isLogin) {
     return <DynamicUserInfor />;
+  } else {
+    return null; // or a loading spinner
+  }
 }
